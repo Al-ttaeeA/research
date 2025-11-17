@@ -3,17 +3,22 @@ package repfinder;
 import java.util.*;
 
 public class RepFinder {
+	/************************************************
+	 * Enter n and k values here to use the program *
+	 ************************************************/
+	static int n = 10;
+	static int k = 2;
+	
+	
 	static ArrayList<String> reps = new ArrayList<String>();
 	static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	static TreeMap<String, ArrayList<String>> sortedLexCycles;
 	static TreeMap<String, ArrayList<String>> sortedColexCycles;
-	static int n = 4;
-	static int k = 3;
-	static int total = (int) Math.pow(k, n);
-	static int currentStringCount = 0;
+	static long total = (long) Math.pow(k, n);
+	static long currentStringCount = 0;
 	
 	public static void main(String[] args) {
-		findReps();
+		findReps(); //populate cycles
 		
 		System.out.println("Representatives in lex order:");
 		for(String key: sortedLexCycles.keySet()) {
@@ -22,7 +27,7 @@ public class RepFinder {
 		
 		System.out.println("\n\n");
 		
-		sortColex();
+		sortColex(); //populate the colex ordered map
 		
 		System.out.println("Representatives in colex order:");
 		for(String key: sortedColexCycles.keySet()) {
@@ -32,6 +37,9 @@ public class RepFinder {
 		System.out.println("\n\nNumber of representatives: " + sortedLexCycles.size());
 	}
 	
+	/****************************
+	 * Method to populate cycles map and create a lex ordered tree map
+	 ****************************/
 	public static void findReps() {
 		String currentStr = "";
 		for(int i = 0; i < n; i++) { //create an all 0s string as first
@@ -77,6 +85,9 @@ public class RepFinder {
 		sortedLexCycles = new TreeMap<String, ArrayList<String>>(cycles);
 	}
 	
+	/*****************************
+	 * Method to create the colex sorted tree map
+	 *****************************/
 	public static void sortColex() {
 		// Create the map with custom comparator
         sortedColexCycles = new TreeMap<>(
@@ -85,7 +96,7 @@ public class RepFinder {
                 String aSub = a.substring(0, n);
                 String bSub = b.substring(0, n);
 
-                // Compare colexicographically (right-to-left)
+                // Compare colexicographically
                 for (int i = n - 1; i >= 0; i--) {
                     char ac = aSub.charAt(i);
                     char bc = bSub.charAt(i);
@@ -102,6 +113,11 @@ public class RepFinder {
         sortedColexCycles.putAll(cycles);
 	}
 	
+	/**************************************
+	 * Method to find the representative k*n length string of an initial string
+	 * @param str - initial string
+	 * @return returns the representative
+	 **************************************/
 	public static String getRep(String str) {
 		String extendedStr = extendString(str);
 		String rep = extendedStr; //start with declaring representative as the extended string
@@ -121,7 +137,7 @@ public class RepFinder {
 	 * Method to extend a n-length string to its CCR function based long string
 	 * @param str - initial string
 	 * @return returns the extended form of the string
-	 */
+	 ********************************************/
 	public static String extendString(String str) {
 		String extendedStr = str; //start with the string
 		
@@ -137,7 +153,7 @@ public class RepFinder {
 	 * Finds the next string in lexicographic order of an n-length string
 	 * @param str - initial string
 	 * @return returns next string in lex order
-	 */
+	 ***************************************/
 	public static String nextLex(String str) {
 		char[] chars = str.toCharArray();
         int n = chars.length;
@@ -166,7 +182,7 @@ public class RepFinder {
 	 * Method to find the next cycle in the same equivalence class after a string using the CCR feedback function
 	 * @param str - initial string
 	 * @return returns the next cycle by CCR
-	 */
+	 *****************************************/
 	public static String nextCycleCCR(String str) {
 		String nextStr = str.substring(1); //copy the last n-1 digits as the first n-1 digit
 		nextStr += (str.charAt(0) - '0' + 1) % k; //add a_1 plus 1 modulus k
@@ -178,7 +194,7 @@ public class RepFinder {
 	 * Method to rotate the string to the next cycle
 	 * @param str - initial String
 	 * @return return the next cycle
-	 */
+	 *****************************************/
 	public static String nextCycle(String str) {
 		String nextStr = str.substring(1); //copy the last n-1 digits as the first n-1 digit
 		nextStr += str.charAt(0); //copy the first
@@ -190,7 +206,7 @@ public class RepFinder {
 	 * Method to find the next char after a string using the CCR feedback function
 	 * @param str - initial string
 	 * @return returns the next char
-	 */
+	 ****************************************/
 	public static String nextChar(String str) {
 		String nextChar = "";
 		nextChar += (str.charAt(0) - '0' + 1) % k; //add a_1 plus 1 modulus k
