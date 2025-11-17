@@ -1,0 +1,60 @@
+################################
+#        Java ignores          #
+################################
+
+# Compiled classes
+*.class
+
+# Build directories
+bin/
+out/
+build/
+target/
+
+# Jars / archives
+*.jar
+*.war
+*.ear
+
+################################
+#        C ignores             #
+################################
+
+# Object files
+*.o
+*.obj
+
+# Libraries
+*.a
+*.so
+*.dll
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.elf
+
+# Build output folders
+bin/
+obj/
+lib/
+
+################################
+#      General ignores         #
+################################
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
+*.swp
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
