@@ -6,7 +6,8 @@ public class RepFinder {
 	static ArrayList<String> reps = new ArrayList<String>();
 	static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	static TreeMap<String, ArrayList<String>> sortedLexCycles;
-	static int n = 5;
+	static TreeMap<String, ArrayList<String>> sortedColexCycles;
+	static int n = 4;
 	static int k = 3;
 	static int total = (int) Math.pow(k, n);
 	static int currentStringCount = 0;
@@ -14,8 +15,18 @@ public class RepFinder {
 	public static void main(String[] args) {
 		findReps();
 		
-		for(Map.Entry<String, ArrayList<String>> entry: sortedLexCycles.entrySet()) {
-			System.out.println(entry);
+		System.out.println("Representatives in lex order:");
+		for(String key: sortedLexCycles.keySet()) {
+			System.out.println(key);
+		}
+		
+		System.out.println("\n\n");
+		
+		sortColex();
+		
+		System.out.println("Representatives in colex order:");
+		for(String key: sortedColexCycles.keySet()) {
+			System.out.println(key);
 		}
 		
 		System.out.println("\n\nNumber of representatives: " + sortedLexCycles.size());
@@ -64,6 +75,31 @@ public class RepFinder {
 		}
 		
 		sortedLexCycles = new TreeMap<String, ArrayList<String>>(cycles);
+	}
+	
+	public static void sortColex() {
+		// Create the map with custom comparator
+        sortedColexCycles = new TreeMap<>(
+            (a, b) -> {
+                // Extract first n characters
+                String aSub = a.substring(0, n);
+                String bSub = b.substring(0, n);
+
+                // Compare colexicographically (right-to-left)
+                for (int i = n - 1; i >= 0; i--) {
+                    char ac = aSub.charAt(i);
+                    char bc = bSub.charAt(i);
+                    if (ac != bc) {
+                        return Character.compare(ac, bc);
+                    }
+                }
+
+                // If first n chars are equal, compare full string as tie-breaker
+                return a.compareTo(b);
+            }
+        );
+
+        sortedColexCycles.putAll(cycles);
 	}
 	
 	public static String getRep(String str) {
