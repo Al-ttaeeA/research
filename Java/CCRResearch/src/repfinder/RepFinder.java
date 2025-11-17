@@ -5,13 +5,20 @@ import java.util.*;
 public class RepFinder {
 	static ArrayList<String> reps = new ArrayList<String>();
 	static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
-	static int n = 4;
-	static int k = 2;
+	static TreeMap<String, ArrayList<String>> sortedLexCycles;
+	static int n = 5;
+	static int k = 3;
 	static int total = (int) Math.pow(k, n);
+	static int currentStringCount = 0;
 	
 	public static void main(String[] args) {
-		String str = "1101";
-		System.out.println(getRep(str));
+		findReps();
+		
+		for(Map.Entry<String, ArrayList<String>> entry: sortedLexCycles.entrySet()) {
+			System.out.println(entry);
+		}
+		
+		System.out.println("\n\nNumber of representatives: " + sortedLexCycles.size());
 	}
 	
 	public static void findReps() {
@@ -28,8 +35,35 @@ public class RepFinder {
 				continue;
 			}
 			
+			//Cycles list for this representative
+			ArrayList<String> currentRepCycles = new ArrayList<String>();
+			String currentExtended = extendString(currentStr); //start with the current string
+			int j;
+			for(j = 0; j < (n*k); j++) {
+				currentRepCycles.add(currentExtended); //add the current 
+				currentExtended = nextCycle(currentExtended); //then cycle to the next
+				
+				//if the next cycle is equal to the representative then exit loop
+				if(currentExtended.equals(rep)) {
+					j++;
+					break;
+				}
+			}
 			
+			currentStringCount += j;
+			
+			cycles.put(rep, currentRepCycles); //add the list to the hashmap
+			
+			//if the current count of strings in the hashmap is equal to total then exit the loop
+			if(currentStringCount == total) {
+				break;
+			}
+			
+			//otherwise get next lex string and continue
+			currentStr = nextLex(currentStr);
 		}
+		
+		sortedLexCycles = new TreeMap<String, ArrayList<String>>(cycles);
 	}
 	
 	public static String getRep(String str) {
