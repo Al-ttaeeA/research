@@ -10,3 +10,8 @@ To use the program simply change the values of the fields "n" and "k" and then r
 The program prints all the representatives first in lex order, then in colex order 
 
 All the cycles are stored in 3 maps, one of which is the initial map, the other two are the same but sorted in lex or colex order. A list of cycles for each representative can be found using the representative as key
+
+## 2. DBChecker.java
+A simple program that checks if a given string is a DB sequence of the given n and k values
+
+To use it simply put the string, expected n and k values and run the program
