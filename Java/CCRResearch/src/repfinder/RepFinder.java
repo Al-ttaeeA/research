@@ -6,8 +6,8 @@ public class RepFinder {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	static int n = 8;
-	static int k = 4;
+	static int n = 5;
+	static int k = 3;
 	
 	
 	static ArrayList<String> reps = new ArrayList<String>();

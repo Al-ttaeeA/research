@@ -6,13 +6,13 @@ public class DBChecker {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	static int n = 6;
-	static int k = 2;
+	static int n = 3;
+	static int k = 3;
 	
 	/************************************************
 	 * 		    Enter String to test here 		    *
 	 ************************************************/
-	static String testStr = "000000111111 · 000100111011 · 0011 · 000010111101 · 001010110101 · 000110111001";
+	static String testStr = "000   211 022 100   111 222   010 121 202";
 	
 	static long total = (long) Math.pow(k, n);
 	static ArrayList<String> strings = new ArrayList<String>();
@@ -23,7 +23,7 @@ public class DBChecker {
 		
 		//Test string length
 		if(testStr.length() != total) {
-			System.out.println("Not DB, doesn't satisfy length requirements");
+			System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
 			return;
 		}
 		
