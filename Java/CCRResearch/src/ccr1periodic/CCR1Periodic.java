@@ -25,14 +25,14 @@ public class CCR1Periodic {
 	}
 	
 	/***************************
-	 * Method to check periodic parents upto n=10 and k=10
+	 * Method to check periodic parents upto n=8 and k=6
 	 ***************************/
 	public static void checker() {
 		int count = 0;
 		ArrayList<ArrayList<String>> periodicParents = new ArrayList<>(); //keep track of all child-periodic parent pairs
 		
-		for(int i = 2; i <= 10; i++) {
-			for(int j = 2; j <= 10; j++) {
+		for(int i = 2; i <= 8; i++) {
+			for(int j = 2; j <= 6; j++) {
 				n = i;
 				k = j;
 				initiate(); //call function to initiate all variables according to n=i and k=j
@@ -59,6 +59,7 @@ public class CCR1Periodic {
 			}
 		}
 		
+		System.out.println("\n\n\n\n\n\n\n\nALL periodic parent pairs found: \n");
 		//print every periodic parent found
 		for(ArrayList<String> entry: periodicParents) {
 			System.out.print("\nn=" + entry.get(0) + ", k=" + entry.get(1));
@@ -85,9 +86,6 @@ public class CCR1Periodic {
 		findPeriodics();
 		
 		findParents();
-		
-		System.out.println("\n\nString to parent map:");
-		System.out.println(stringToParent);
 		
 		checkParents();
 	}

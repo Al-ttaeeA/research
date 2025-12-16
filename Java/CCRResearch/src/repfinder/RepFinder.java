@@ -6,7 +6,7 @@ public class RepFinder {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 4;
+	public static int n = 10;
 	public static int k = 5;
 	
 	
@@ -14,7 +14,7 @@ public class RepFinder {
 	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	public static TreeMap<String, ArrayList<String>> sortedLexCycles;
 	public static TreeMap<String, ArrayList<String>> sortedColexCycles;
-	static long total = (long) Math.pow(k, n);
+	static long total;
 	static long currentStringCount = 0;
 	
 	public static void main(String[] args) {
@@ -25,6 +25,8 @@ public class RepFinder {
 	 * Main function migrated here to be used with other classes as well
 	 ****************************/
 	public static void function() {
+		total = (long) Math.pow(k, n);
+		
 		findReps(); //populate cycles
 		
 		System.out.println("Representatives in lex order:");
