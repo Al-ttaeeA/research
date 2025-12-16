@@ -1,16 +1,16 @@
-package ccr2periodic;
+package ccr1periodic;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.HashMap;
 import repfinder.RepFinder;
 
-public class CCR2Periodic {
+public class CCR1Periodic {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	static int n = 8;
-	static int k = 6;
+	static int n = 4;
+	static int k = 3;
 	
 	
 	public static ArrayList<String> reps2;
@@ -114,37 +114,33 @@ public class CCR2Periodic {
 	}
 	
 	/*******************************
-	 * Method to find the parent of every representative, this method is based on the CCR2 parent rule
+	 * Method to find the parent of every representative, this method is based on the CCR1 parent rule
 	 *******************************/
 	public static void findParents() {
 		for(int i = 0; i < reps2.size(); i++) {
 			String rep = reps2.get(i);
-			int index = nonzeroIndex(rep);
+			int index = lastNonzeroIndex(rep);
 			if(index == -1) continue;
 			
 			int value = rep.charAt(index) - '0';
 			
-			//For loop to keep decrementing the first non-zero until a conecklace is found
-			for(int j = 1; j <= value; j++) {
-				String sub = rep.substring(0, index) + (value-j) + rep.substring(index+1,n);
-				
-				String extParent = RepFinder.extendString(sub);
-				
-				if(reps2.contains(extParent)) {
-					stringToParent.put(rep, extParent);
-					break;
-				}
-			}
+			//find the first block of the parent
+			String subParent = rep.substring(0, index) + (value-1) + rep.substring(index+1, n);
+			//Extend and get the rep of the parent
+			String repParent = RepFinder.getRep(subParent);
+			
+			//Add the pair to a map
+			stringToParent.put(rep, repParent);
 		}
 	}
 	
 	/**********************************
-	 * Method to find the firts non-zero digit's index in a rep
+	 * Method to find the last non-zero digit's index in a rep
 	 * @param rep - the representative to check
 	 * @return returns the index or -1 if the first section is all 0s
 	 **********************************/
-	static int nonzeroIndex(String rep) {
-		for(int i = 0; i < n; i++) {
+	static int lastNonzeroIndex(String rep) {
+		for(int i = n-1; i >= 0; i--) {
 			if(rep.charAt(i) != '0') {
 				return i;
 			}

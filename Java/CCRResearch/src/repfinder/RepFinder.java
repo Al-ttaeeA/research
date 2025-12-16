@@ -21,6 +21,9 @@ public class RepFinder {
 		function();
 	}
 	
+	/****************************
+	 * Main function migrated here to be used with other classes as well
+	 ****************************/
 	public static void function() {
 		findReps(); //populate cycles
 		
