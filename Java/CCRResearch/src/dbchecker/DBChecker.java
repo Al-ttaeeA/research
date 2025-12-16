@@ -7,12 +7,12 @@ public class DBChecker {
 	 * Enter n and k values here to use the program *
 	 ************************************************/
 	static int n = 3;
-	static int k = 3;
+	static int k = 6;
 	
 	/************************************************
 	 * 		    Enter String to test here 		    *
 	 ************************************************/
-	static String testStr = "000   211 022 100   111 222   010 121 202";
+	static String testStr = "000   101   312 423 534 045 150 201   412 523 034 145 250   321 432 543 054 105 210   301   512   024 135 240 351 402 513   023 134 245 350   421 532 043 154 205 310   401   212 323 434 545 050   111 222 333 444 555   002 113 224 335 440 551   003 114 225 330 441 552   004 115 220 331 442 553   005 110 221 332 443 554";
 	
 	static long total = (long) Math.pow(k, n);
 	static ArrayList<String> strings = new ArrayList<String>();

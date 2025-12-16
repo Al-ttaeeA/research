@@ -6,18 +6,22 @@ public class RepFinder {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	static int n = 5;
-	static int k = 3;
+	public static int n = 4;
+	public static int k = 5;
 	
 	
-	static ArrayList<String> reps = new ArrayList<String>();
-	static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
-	static TreeMap<String, ArrayList<String>> sortedLexCycles;
-	static TreeMap<String, ArrayList<String>> sortedColexCycles;
+	public static ArrayList<String> reps = new ArrayList<String>();
+	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
+	public static TreeMap<String, ArrayList<String>> sortedLexCycles;
+	public static TreeMap<String, ArrayList<String>> sortedColexCycles;
 	static long total = (long) Math.pow(k, n);
 	static long currentStringCount = 0;
 	
 	public static void main(String[] args) {
+		function();
+	}
+	
+	public static void function() {
 		findReps(); //populate cycles
 		
 		System.out.println("Representatives in lex order:");
@@ -72,6 +76,7 @@ public class RepFinder {
 			currentStringCount += j;
 			
 			cycles.put(rep, currentRepCycles); //add the list to the hashmap
+			reps.add(rep);
 			
 			//if the current count of strings in the hashmap is equal to total then exit the loop
 			if(currentStringCount == total) {
