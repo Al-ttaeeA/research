@@ -6,12 +6,8 @@ import java.util.HashMap;
 import repfinder.RepFinder;
 
 public class CCR3Periodic {
-	/************************************************
-	 * Enter n and k values here to use the program *
-	 ************************************************/
 	static int n = 4;
 	static int k = 3;
-	
 	
 	public static ArrayList<String> reps2;
 	public static ArrayList<String> periodicReps = new ArrayList<String>();
@@ -31,8 +27,14 @@ public class CCR3Periodic {
 		int count = 0;
 		ArrayList<ArrayList<String>> periodicParents = new ArrayList<>(); //keep track of all child-periodic parent pairs
 		
-		for(int i = 2; i <= 8; i++) {
-			for(int j = 2; j <= 6; j++) {
+		/*********************************
+		 * Enter max n and k values here *
+		 *********************************/
+		int maxN = 8;
+		int maxK = 6;
+		
+		for(int i = 2; i <= maxN; i++) {
+			for(int j = 2; j <= maxK; j++) {
 				n = i;
 				k = j;
 				initiate(); //call function to initiate all variables according to n=i and k=j
