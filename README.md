@@ -15,3 +15,8 @@ All the cycles are stored in 3 maps, one of which is the initial map, the other 
 A simple program that checks if a given string is a DB sequence of the given n and k values
 
 To use it simply put the string, expected n and k values and run the program
+
+## 3. CCR1Periodic, CCR2Periodic, and CCR3Periodic
+3 Classes that each check if there are periodic parents when the parents of each rep is found using the respective parent rule
+
+Each program when run checks for all periodic parents upto n=8 and k=6, though these values can be changed by the user if navigated to the checker() function and the 2 nested for-loops
