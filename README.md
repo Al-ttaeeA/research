@@ -1,22 +1,56 @@
-# Research Collection
-This repository is a collection of algorithms and programs that I'm writing to help with my research about De Bruijn Sequences and concatenation algorithms that produce them.
+# De Bruijn Research Collection
 
-# List of current programs:
-## 1. RepFinder.java
-A program that generates all the CCR based cycles and representatives of n-length k-ary alphabet strings
+This repository contains a collection of programs and algorithms developed to support my research under Professor Joseph Sawada into **De Bruijn sequences**, **concatenation-based constructions**, and **periodicity properties of cyclic representatives**.
 
-To use the program simply change the values of the fields "n" and "k" and then run the program
+The focus of this work is on understanding how equivalence classes of k-ary strings behave under various parent rules and how these structures relate to the generation and verification of De Bruijn sequences.
 
-The program prints all the representatives first in lex order, then in colex order 
+## Research Focus
+- De Bruijn sequences over k-ary alphabets
+- Concatenation algorithms for DB sequence construction
+- CCR-based cycle representations
+- Periodicity of parent structures under different rules
 
-All the cycles are stored in 3 maps, one of which is the initial map, the other two are the same but sorted in lex or colex order. A list of cycles for each representative can be found using the representative as key
+This repository serves as an experimental and verification toolkit rather than a polished application.
 
-## 2. DBChecker.java
-A simple program that checks if a given string is a DB sequence of the given n and k values
+## Programs Included
 
-To use it simply put the string, expected n and k values and run the program
+### 1. `RepFinder.java`
+Generates all **CCR-based cycles and representatives** for n-length strings over a k-ary alphabet.
 
-## 3. CCR1Periodic, CCR2Periodic, and CCR3Periodic
-3 Classes that each check if there are periodic parents when the parents of each rep is found using the respective parent rule
+- Representatives are printed in both **lexicographic** and **colexicographic** order
+- Cycles are stored in three maps:
+  - Original generation order
+  - Lex-sorted
+  - Colex-sorted
+- Each representative maps to its corresponding cycle structure
 
-Each program when run checks for all periodic parents upto n=8 and k=6, though these values can be changed by the user if navigated to the checker() function and the 2 nested for-loops
+Parameters `n` and `k` can be modified directly in the source before execution.
+
+### 2. `DBChecker.java`
+Verifies whether a given string is a valid **De Bruijn sequence** for specified values of `n` and `k`.
+
+This tool is primarily used to validate candidate sequences produced by experimental constructions.
+
+### 3. `CCR1Periodic`, `CCR2Periodic`, `CCR3Periodic`
+Three programs that test for **periodic parents** under different CCR parent rules.
+
+- Each class implements a distinct parent rule
+- By default, checks all cases up to `n = 8` and `k = 6`
+- These bounds can be adjusted in the `checker()` method
+
+The results are used to explore structural differences between parent rules and their impact on periodicity.
+
+## What This Repository Is (and Is Not)
+- ✔ A research and experimentation toolkit
+- ✔ Focused on theoretical computer science and discrete mathematics
+- ✘ Not a finished library
+- ✘ Not optimized for performance or UI
+
+## What I Learned
+- Practical exploration of equivalence classes in combinatorics on words
+- Implementing abstract mathematical rules as executable algorithms
+- Using computational experiments to support theoretical reasoning
+- Managing correctness and verification in research-driven code
+
+## License
+This repository is released under the GNU General Public License (GPL).
