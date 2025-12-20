@@ -19,11 +19,51 @@ public class CCR2Construction {
 		total = (long) Math.pow(k, n);
 		findReps();
 		
-		System.out.println(reps);
+		String start = reps.get(0);
+		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
+		int changeIndex = n-1;
+		
+		System.out.println(leastPeriod("012301230123"));
 	}
 	
-	public static void recursiveConcat(String extString) {
+	/***************************************************
+	 * Recursive method to concatenate strings based on RCL traversal
+	 * @param extString - current node
+	 * @param changeIndex - change index of the current node
+	 * @param traversal - concatenation tree type, 1 for left, 0 for right
+	 ***************************************************/
+	public static void recursiveConcat(String extString, int changeIndex, int traversal) {
+		//check right children
+		for(int i = changeIndex + traversal; i < n; i++) {
+			
+		}
 		
+		
+	}
+	
+	/*************************************************
+	 * Method to find the least period of a string to concatenate it
+	 * @param extString - the extended string to find the period of
+	 * @return returns the least period
+	 *************************************************/
+	public static String leastPeriod(String extString) {
+		for(int len = 1; len < k*n; len++) {
+			if(k*n % len == 0) {
+				String period = extString.substring(0, len);
+				String newString = "";
+				
+				int repetition = k*n / len;
+				for(int i = 0; i < repetition; i++) {
+					newString += period;
+				}
+				
+				if(extString.equals(newString)) {
+					return period;
+				}
+			}
+		}
+		
+		return extString;
 	}
 	
 	/****************************
