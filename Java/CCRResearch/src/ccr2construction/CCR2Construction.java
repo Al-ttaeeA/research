@@ -23,7 +23,7 @@ public class CCR2Construction {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-		System.out.println(leastPeriod("012301230123"));
+		System.out.println(findChildCCR2("002011012212", 0));
 	}
 	
 	/***************************************************
@@ -38,7 +38,48 @@ public class CCR2Construction {
 			
 		}
 		
+		sequence += " ";
+		sequence += leastPeriod(extString);
+		sequence += " ";
 		
+		//check left children
+		for(int i = 0; i < changeIndex + traversal; i++) {
+			
+		}
+	}
+	
+	/**************************************************************
+	 * Method to find a child of a string at a given index based on CCR2 parent rule
+	 * @param extString - extended parent string
+	 * @param index - index to find a child at
+	 * @return returns the child string OR null if no children were found
+	 **************************************************************/
+	public static String findChildCCR2(String extString, int index) {
+		int value = extString.charAt(index) - '0'; //get the integer value of the index
+		
+		if(value == k-1) { //if the value is already the highest digit then it has no children
+			return null;
+		}
+		
+		//for loop to check if all zeros preceding the current index
+		//If there is a zero before the current index then it cannot possibly have children there
+		for(int i = 0; i < index; i++) {
+			if(extString.charAt(i) != '0') {
+				return null;
+			}
+		}
+		
+		for(int newValue = value + 1; newValue <= k-1; newValue++) { //loop through all possible value the child may have at that index
+			String firstSection = extString.substring(0, index) + newValue + extString.substring(index+1, n); //get the first section of possible child
+			
+			String newExtended = extendString(firstSection); //find extended version of possible child
+			
+			if(reps.contains(newExtended)) { //IF the extended possible child is a conecklace then it is a valid child
+				return newExtended;
+			}
+		}
+		
+		return null; //Return null if we went through all possible children at this index
 	}
 	
 	/*************************************************
