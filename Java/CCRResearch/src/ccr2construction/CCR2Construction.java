@@ -1,23 +1,27 @@
 package ccr2construction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
 	public static int n = 10;
-	public static int k = 5;
+	public static int k = 4;
 	
 	public static long total;
 	
 	public static String sequence = ""; //The entire sequence will be concatenated here using recursion
 	
 	public static ArrayList<String> reps = new ArrayList<String>(); //Arraylist to store all conecklaces
+	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	
 	public static void main(String[] args) {
 		total = (long) Math.pow(k, n);
 		findReps();
+		
+		System.out.println("Reps found");
 		
 		String start = reps.get(0);
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
@@ -86,7 +90,7 @@ public class CCR2Construction {
 			
 			String newExtended = extendString(firstSection); //find extended version of possible child
 			
-			if(reps.contains(newExtended)) { //IF the extended possible child is a conecklace then it is a valid child
+			if(cycles.containsKey(newExtended)) { //IF the extended possible child is a conecklace then it is a valid child
 				return newExtended;
 			}
 		}
@@ -187,16 +191,19 @@ public class CCR2Construction {
 		for(int i = 0; i < total; i++) {
 			String rep = getRep(currentStr);
 			
-			if(reps.contains(rep)) {
+			if(cycles.containsKey(rep)) { //if the representative is in the hashmap then move to the next one
 				currentStr = nextLex(currentStr);
 				continue;
 			}
 					
+			//Cycles list for this representative
+			ArrayList<String> currentRepCycles = new ArrayList<String>();
 			String currentExtended = extendString(currentStr);
 			
 			int j;
 			for(j = 0; j < (n*k); j++) {
-				currentExtended = nextCycle(currentExtended); //cycle to the next
+				currentRepCycles.add(currentExtended); //add the current 
+				currentExtended = nextCycle(currentExtended); //then cycle to the next
 				
 				//if the next cycle is equal to the representative then exit loop
 				if(currentExtended.equals(rep)) {
@@ -207,6 +214,7 @@ public class CCR2Construction {
 			
 			currentStringCount += j;
 			
+			cycles.put(rep, currentRepCycles); //add the list to the hashmap
 			reps.add(rep);
 			
 			if(currentStringCount == total) {
