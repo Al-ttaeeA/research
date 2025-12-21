@@ -23,7 +23,9 @@ public class CCR2Construction {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-		System.out.println(findChildCCR2("002011012212", 0));
+		recursiveConcat("000011112222", 3, 1);
+		
+		System.out.println(sequence);
 	}
 	
 	/***************************************************
@@ -35,7 +37,11 @@ public class CCR2Construction {
 	public static void recursiveConcat(String extString, int changeIndex, int traversal) {
 		//check right children
 		for(int i = changeIndex + traversal; i < n; i++) {
+			String child = findChildCCR2(extString, i);
 			
+			if(child != null) {
+				recursiveConcat(child, i, traversal);
+			}
 		}
 		
 		sequence += " ";
@@ -44,7 +50,11 @@ public class CCR2Construction {
 		
 		//check left children
 		for(int i = 0; i < changeIndex + traversal; i++) {
+			String child = findChildCCR2(extString, i);
 			
+			if(child != null) {
+				recursiveConcat(child, i, traversal);
+			}
 		}
 	}
 	
