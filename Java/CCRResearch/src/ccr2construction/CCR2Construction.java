@@ -6,7 +6,7 @@ public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 2;
+	public static int n = 8;
 	public static int k = 4;
 	
 	public static long total;
@@ -26,6 +26,8 @@ public class CCR2Construction {
 		recursiveConcat(start, changeIndex, traversal);
 		
 		System.out.println(sequence);
+		
+		DBChecker(sequence);
 	}
 	
 	/***************************************************
@@ -90,6 +92,41 @@ public class CCR2Construction {
 		}
 		
 		return null; //Return null if we went through all possible children at this index
+	}
+	
+	/**********************************************
+	 * Method to check if a string is a DB sequence for a specific n,k universe
+	 * @param testStr - the string to be tested
+	 * @return returns true if DB, false if not DB sequence
+	 **********************************************/
+	public static boolean DBChecker(String testStr) {
+		ArrayList<String> strings = new ArrayList<String>();
+		
+		//Trim string from all spaces and slashes
+		testStr = testStr.replace(" ", "").replace("\\", "").replace("·", "");
+		
+		//Test string length
+		if(testStr.length() != total) {
+			System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
+			return false;
+		}
+		
+		//Add the first n to the end
+		testStr = testStr + testStr.substring(0, n);
+		
+		//Add the string at each index to the list and check for duplicates
+		for(int i = 0; i < Math.pow(k, n); i++) {
+			strings.add(testStr.substring(i, i+n));
+		}
+		
+		if(strings.size() == total) {
+			System.out.println("String is a DB");
+			return true;
+		}
+		else {
+			System.out.println("Not DB, doesn't cover all strings");
+			return false;
+		}
 	}
 	
 	/*************************************************
