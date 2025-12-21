@@ -6,8 +6,8 @@ public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 4;
-	public static int k = 3;
+	public static int n = 2;
+	public static int k = 4;
 	
 	public static long total;
 	
@@ -23,7 +23,7 @@ public class CCR2Construction {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-		recursiveConcat("000011112222", 3, 1);
+		recursiveConcat(start, changeIndex, traversal);
 		
 		System.out.println(sequence);
 	}
