@@ -40,6 +40,13 @@ Three programs that test for **periodic parents** under different CCR parent rul
 
 The results are used to explore structural differences between parent rules and their impact on periodicity.
 
+### 4. `CCR2Construction.java`
+A program that constructs a sequence using the concatenation tree framework and the CCR2 parent rule, then it checks if the sequence is actually a DB sequence or not
+
+This construction algorithm is the culmination of the first step of this research project, as it applies the concatenation tree framework on CCR2 function.
+
+2 more programs will be created using CCR1 and CCR3 parent rules respectively.
+
 ## What This Repository Is (and Is Not)
 - ✔ A research and experimentation toolkit
 - ✔ Focused on theoretical computer science and discrete mathematics

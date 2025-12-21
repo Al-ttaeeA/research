@@ -158,8 +158,10 @@ public class CCR2Construction {
 	 * @return returns the least period
 	 *************************************************/
 	public static String leastPeriod(String extString) {
-		for(int len = 1; len < k*n; len++) {
+		//For loop to loop through all possible periodic lengths
+		for(int len = 1; len < k*n / 2; len++) {
 			if(k*n % len == 0) {
+				//pick the first substring and compare if it actually periodically concatenates to make the extString
 				String period = extString.substring(0, len);
 				String newString = "";
 				
