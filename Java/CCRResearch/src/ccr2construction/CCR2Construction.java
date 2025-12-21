@@ -6,8 +6,8 @@ public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 8;
-	public static int k = 4;
+	public static int n = 10;
+	public static int k = 5;
 	
 	public static long total;
 	
@@ -96,37 +96,56 @@ public class CCR2Construction {
 	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
+	 * This algorithm converts every n-length string into a base-k value, and uses the value to keep track of duplicates
 	 * @param testStr - the string to be tested
 	 * @return returns true if DB, false if not DB sequence
 	 **********************************************/
 	public static boolean DBChecker(String testStr) {
-		ArrayList<String> strings = new ArrayList<String>();
-		
-		//Trim string from all spaces and slashes
 		testStr = testStr.replace(" ", "").replace("\\", "").replace("·", "");
 		
-		//Test string length
-		if(testStr.length() != total) {
-			System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
-			return false;
-		}
-		
-		//Add the first n to the end
-		testStr = testStr + testStr.substring(0, n);
-		
-		//Add the string at each index to the list and check for duplicates
-		for(int i = 0; i < Math.pow(k, n); i++) {
-			strings.add(testStr.substring(i, i+n));
-		}
-		
-		if(strings.size() == total) {
-			System.out.println("String is a DB");
-			return true;
-		}
-		else {
-			System.out.println("Not DB, doesn't cover all strings");
-			return false;
-		}
+	    int total = 1;
+	    for (int i = 0; i < n; i++) total *= k;
+
+	    // Length check
+	    if (testStr.length() != total) {
+	    	System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
+	        return false;
+	    }
+
+	    // Seen substrings
+	    boolean[] seen = new boolean[total];
+
+	    // Extend string for cyclic wraparound
+	    testStr = testStr + testStr.substring(0, n - 1);
+
+	    int value = 0;
+	    int base = 1;
+	    for (int i = 0; i < n - 1; i++) base *= k;
+
+	    // Initialize first window
+	    for (int i = 0; i < n; i++) {
+	        value = value * k + charToInt(testStr.charAt(i));
+	    }
+
+	    for (int i = 0; i < total; i++) {
+	        if (seen[value]) {
+	        	System.out.println("Not DB, duplicate string: " + testStr.substring(i, i+n));
+	            return false; // duplicate substring
+	        }
+	        seen[value] = true;
+
+	        // Rolling window update
+	        if (i + n < testStr.length()) {
+	            value = (value % base) * k + charToInt(testStr.charAt(i + n));
+	        }
+	    }
+	    
+	    System.out.println("String is a DB");
+	    return true;
+	}
+
+	private static int charToInt(char c) {
+	    return c - '0';
 	}
 	
 	/*************************************************
