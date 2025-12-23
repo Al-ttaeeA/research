@@ -30,8 +30,8 @@ public class CCR3Periodic {
 		/*********************************
 		 * Enter max n and k values here *
 		 *********************************/
-		int maxN = 30;
-		int maxK = 2;
+		int maxN = 8;
+		int maxK = 6;
 		
 		for(int i = 2; i <= maxN; i++) {
 			for(int j = 2; j <= maxK; j++) {
@@ -129,6 +129,9 @@ public class CCR3Periodic {
 			//CCR3 parent rule
 			if(value == 0) {
 				newValue = 1;
+			}
+			else if (value == 2) {
+				newValue = 0;
 			}
 			else {
 				newValue = value - 1;

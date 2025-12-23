@@ -3,6 +3,8 @@ package ccr3construction;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import repfinder.RepFinder;
+
 public class CCR3Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
@@ -27,9 +29,11 @@ public class CCR3Construction {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-		recursiveConcat(start, changeIndex, traversal);
+//		recursiveConcat(start, changeIndex, traversal);
+//		
+//		System.out.println(sequence);
 		
-		System.out.println(sequence);
+		System.out.println(findChildCCR3("412023134240301", 2));
 	}
 	
 	/***************************************************
@@ -65,6 +69,11 @@ public class CCR3Construction {
 	public static String findChildCCR3(String extString, int index) {
 		int value = extString.charAt(index) - '0';
 		
+		//If the value is the maximum it cant have children
+		if(value == k-1) {
+			return null;
+		}
+		
 		int newValue;
 		
 		if(value == 1) {
@@ -81,7 +90,55 @@ public class CCR3Construction {
 		String subParent = extString.substring(section * n, (section + 1) * n);
 		
 		String subChild = subParent.substring(0, sectionIndex) + newValue + subParent.substring(sectionIndex + 1, n);
+		
+		//Get the child shifted, and the representative
 		String child = extendString(subChild); //This is the possible child
+		String childRep = getRep(child);
+		
+		
+		
+		//get the parent of the found child's rep, and the extString rep
+		String foundParentRep = parent(childRep); //This is the actual parent of the possible child
+		String actualParentRep = getRep(extString); //This is the parent we want
+		
+		//If the parent of the found child matches the extString's rep, then it is a child, we need to check if its at the correct index
+		if(actualParentRep.equals(foundParentRep)) {
+			
+		}
+		
+		return null;
+	}
+	
+	/*******************************************
+	 * Method to find the parent rep of a child rep string
+	 * @param childRep - the child rep
+	 * @return returns the parent rep or null if the child rep is all 0s
+	 *******************************************/
+	public static String parent(String childRep) {
+		if(childRep.equals(reps.get(0))) { //if the child is all 0s initial
+			return null;
+		}
+		
+		int index = n-1;
+		int value = childRep.charAt(index) - '0';
+		
+		int newValue;
+		
+		//CCR3 parent rule
+		if(value == 0) {
+			newValue = 1;
+		} else if(value == 2) {
+			newValue = 0;
+		} else {
+			newValue = value - 1;
+		}
+		
+		//find the first block of the parent
+		String subParent = childRep.substring(0, index) + newValue;
+		//Extend and get the rep of the parent
+		String repParent = getRep(subParent);
+		
+		return repParent;
 	}
 	
 	/**********************************************
@@ -240,6 +297,8 @@ public class CCR3Construction {
 	 ********************************************/
 	public static String extendString(String str) {
 		String extendedStr = str; //start with the string
+		
+		if(extendedStr.length() == k*n) return extendedStr;
 		
 		//extend the string
 		for(int i = 0; i < (k-1) * n; i++) {
