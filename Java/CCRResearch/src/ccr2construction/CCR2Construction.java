@@ -7,8 +7,8 @@ public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 10;
-	public static int k = 4;
+	public static int n = 4;
+	public static int k = 5;
 	
 	public static long total;
 	
@@ -159,7 +159,7 @@ public class CCR2Construction {
 	 *************************************************/
 	public static String leastPeriod(String extString) {
 		//For loop to loop through all possible periodic lengths
-		for(int len = 1; len < k*n / 2; len++) {
+		for(int len = 1; len <= k*n / 2; len++) {
 			if(k*n % len == 0) {
 				//pick the first substring and compare if it actually periodically concatenates to make the extString
 				String period = extString.substring(0, len);

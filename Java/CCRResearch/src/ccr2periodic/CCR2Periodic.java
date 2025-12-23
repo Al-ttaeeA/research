@@ -30,8 +30,8 @@ public class CCR2Periodic {
 		/*********************************
 		 * Enter max n and k values here *
 		 *********************************/
-		int maxN = 8;
-		int maxK = 6;
+		int maxN = 4;
+		int maxK = 5;
 		
 		for(int i = 2; i <= maxN; i++) {
 			for(int j = 2; j <= maxK; j++) {
