@@ -9,8 +9,8 @@ public class CCR3Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 3;
-	public static int k = 5;
+	public static int n = 7;
+	public static int k = 4;
 	
 	public static long total;
 	
@@ -32,6 +32,8 @@ public class CCR3Construction {
 		recursiveConcat(start, changeIndex, traversal);
 		
  		System.out.println(sequence);
+ 		
+ 		DBChecker(sequence);
 	}
 	
 	/***************************************************
@@ -51,10 +53,26 @@ public class CCR3Construction {
 			//inner loop runs n times
 			for(int index = Math.max(changeIndex + traversal, section * n); index < Math.min(leastLength, ((section + 1) * n)); index++) {
 				//Check child at each index
+				String child = findChildCCR3(extString, index);
+				
+				if(child != null) {
+					recursiveConcat(child, index % n, traversal);
+				}
 			}
 			
 			//After checking right children of each section, concatenate the section
 			sequence += least.substring(section * n, Math.min(leastLength, ((section + 1) * n)));
+		}
+		
+		sequence += " ";
+		
+		//Left children
+		for(int i = 0; i < changeIndex + traversal; i++) {
+			String child = findChildCCR3(extString, i);
+			
+			if(child != null) {
+				recursiveConcat(child, i, traversal);
+			}
 		}
 	}
 	
@@ -102,8 +120,10 @@ public class CCR3Construction {
 			ArrayList<String> childCycles = cycles.get(childRep);
 			int childShift = childCycles.indexOf(child);
 			
-			int expectedChangeIndex = n-1; //change index on rep is always last digit of first section
-			int foundChangeIndex = childShift + sectionIndex; //found change index 
+			int leastPeriod = leastPeriod(child).length();
+			
+			int expectedChangeIndex = (n-1) % leastPeriod; //change index on rep is always last digit of first section
+			int foundChangeIndex = (childShift + sectionIndex) % leastPeriod; //found change index 
 			
 			if(expectedChangeIndex == foundChangeIndex) {
 				return child;
