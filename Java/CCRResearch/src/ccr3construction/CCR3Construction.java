@@ -29,11 +29,9 @@ public class CCR3Construction {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-//		recursiveConcat(start, changeIndex, traversal);
-//		
-//		System.out.println(sequence);
+		recursiveConcat(start, changeIndex, traversal);
 		
-		System.out.println(findChildCCR3("412023134240301", 2));
+ 		System.out.println(sequence);
 	}
 	
 	/***************************************************
@@ -95,15 +93,21 @@ public class CCR3Construction {
 		String child = extendString(subChild); //This is the possible child
 		String childRep = getRep(child);
 		
-		
-		
 		//get the parent of the found child's rep, and the extString rep
 		String foundParentRep = parent(childRep); //This is the actual parent of the possible child
 		String actualParentRep = getRep(extString); //This is the parent we want
 		
 		//If the parent of the found child matches the extString's rep, then it is a child, we need to check if its at the correct index
 		if(actualParentRep.equals(foundParentRep)) {
+			ArrayList<String> childCycles = cycles.get(childRep);
+			int childShift = childCycles.indexOf(child);
 			
+			int expectedChangeIndex = n-1; //change index on rep is always last digit of first section
+			int foundChangeIndex = childShift + sectionIndex; //found change index 
+			
+			if(expectedChangeIndex == foundChangeIndex) {
+				return child;
+			}
 		}
 		
 		return null;
