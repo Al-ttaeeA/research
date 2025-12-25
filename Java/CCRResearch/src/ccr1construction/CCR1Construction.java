@@ -3,6 +3,8 @@ package ccr1construction;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import repfinder.RepFinder;
+
 public class CCR1Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
@@ -74,6 +76,72 @@ public class CCR1Construction {
 		}
 	}
 	
+	/**************************************************************
+	 * Method to find a child of a string at a given index based on CCR1 parent rule
+	 * @param extString - extended parent string
+	 * @param index - index to find a child at
+	 * @return returns the child string OR null if no children were found
+	 **************************************************************/
+	public static String findChildCCR1(String extString, int index) {
+		int value = extString.charAt(index) - '0';
+		
+		//If the value is the maximum it cant have children
+		if(value == k-1) {
+			return null;
+		}
+		
+		int newValue = value + 1;
+		
+		int section = index / n;
+		int sectionIndex = index % n;
+		
+		String subParent = extString.substring(section * n, (section + 1) * n);
+		
+		String subChild = subParent.substring(0, sectionIndex) + newValue + subParent.substring(sectionIndex + 1, n);
+		
+		//Get the child shifted, and the representative
+		String child = extendString(subChild); //This is the possible child
+		String childRep = getRep(child);
+		
+		
+	}
+	
+	/*******************************************
+	 * Method to find the parent rep of a child rep string
+	 * @param childRep - the child rep
+	 * @return returns the parent rep or null if the child rep is all 0s
+	 *******************************************/
+	public static String parent(String childRep) {
+		if(childRep.equals(reps.get(0))) { //if the child is all 0s initial
+			return null;
+		}
+		
+		int index = lastNonzeroIndex(childRep);
+		
+		int value = childRep.charAt(index) - '0';
+		
+		//find the first block of the parent
+		String subParent = childRep.substring(0, index) + (value-1) + childRep.substring(index+1, n);
+		//Extend and get the rep of the parent
+		String repParent = RepFinder.getRep(subParent);
+		
+		return repParent;
+	}
+	
+	/**********************************
+	 * Method to find the last non-zero digit's index in a rep
+	 * @param rep - the representative to check
+	 * @return returns the index or -1 if the first section is all 0s
+	 **********************************/
+	static int lastNonzeroIndex(String rep) {
+		for(int i = n-1; i >= 0; i--) {
+			if(rep.charAt(i) != '0') {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
 	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
