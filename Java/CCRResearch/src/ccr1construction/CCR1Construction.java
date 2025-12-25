@@ -34,6 +34,46 @@ public class CCR1Construction {
  		DBChecker(sequence);
 	}
 	
+	/***************************************************
+	 * Recursive method to concatenate strings based on RCL traversal
+	 * @param extString - current node
+	 * @param changeIndex - change index of the current node
+	 * @param traversal - concatenation tree type, 1 for left, 0 for right
+	 ***************************************************/
+	public static void recursiveConcat(String extString, int changeIndex, int traversal) {
+		String least = leastPeriod(extString);
+		int leastLength = least.length();
+		
+		sequence += " ";
+		
+		//outer loop runs for each n-length section
+		for(int section = 0; section < Math.min((leastLength / n) + 1, k); section++) {
+			//inner loop runs n times
+			for(int index = Math.max(changeIndex + traversal, section * n); index < Math.min(leastLength, ((section + 1) * n)); index++) {
+				//Check child at each index
+				String child = findChildCCR1(extString, index);
+				
+				if(child != null) {
+					recursiveConcat(child, index % n, traversal);
+				}
+			}
+			
+			//After checking right children of each section, concatenate the section
+			sequence += least.substring(section * n, Math.min(leastLength, ((section + 1) * n)));
+		}
+		
+		sequence += " ";
+		
+		//Left children
+		for(int i = 0; i < changeIndex + traversal; i++) {
+			String child = findChildCCR1(extString, i);
+			
+			if(child != null) {
+				recursiveConcat(child, i, traversal);
+			}
+		}
+	}
+	
 	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
