@@ -1,5 +1,4 @@
 package ccr1construction;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,8 +8,8 @@ public class CCR1Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 7;
-	public static int k = 4;
+	public static int n = 8;
+	public static int k = 5;
 	
 	public static long total;
 	
@@ -99,11 +98,38 @@ public class CCR1Construction {
 		
 		String subChild = subParent.substring(0, sectionIndex) + newValue + subParent.substring(sectionIndex + 1, n);
 		
+		//System.out.println("subParent: " + subParent + ", subChild: " + subChild);
+		
 		//Get the child shifted, and the representative
 		String child = extendString(subChild); //This is the possible child
 		String childRep = getRep(child);
 		
+		//get the parent of the found child's rep, and the extString rep
+		String foundParentRep = parent(childRep); //This is the actual parent of the possible child
+		String actualParentRep = getRep(extString); //This is the parent we want
 		
+		//System.out.println("Child: " + child + ", childRep: " + childRep);
+		//System.out.println("parents: " + foundParentRep + "   " + actualParentRep);
+		
+		//If the parent of the found child matches the extString's rep, then it is a child, we need to check if its at the correct index
+		if(actualParentRep.equals(foundParentRep)) {
+			ArrayList<String> childCycles = cycles.get(childRep);
+			int childShift = childCycles.indexOf(child);
+			
+			int leastPeriod = leastPeriod(child).length();
+			
+			int expectedChangeIndex = lastNonzeroIndex(childRep) % leastPeriod; //change index on rep is always last digit of first section
+			int foundChangeIndex = (childShift + sectionIndex) % leastPeriod; //found change index 
+			
+			//System.out.println("childShift: " + childShift + ", sectionIndex: " + sectionIndex + ", leastPeriod " + leastPeriod);
+			//System.out.println("Change indices: " + expectedChangeIndex + "   " + foundChangeIndex);
+			
+			if(expectedChangeIndex == foundChangeIndex) {
+				return child;
+			}
+		}
+		
+		return null;
 	}
 	
 	/*******************************************
@@ -123,7 +149,7 @@ public class CCR1Construction {
 		//find the first block of the parent
 		String subParent = childRep.substring(0, index) + (value-1) + childRep.substring(index+1, n);
 		//Extend and get the rep of the parent
-		String repParent = RepFinder.getRep(subParent);
+		String repParent = getRep(subParent);
 		
 		return repParent;
 	}
