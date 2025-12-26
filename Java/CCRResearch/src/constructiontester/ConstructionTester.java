@@ -11,8 +11,10 @@ public class ConstructionTester {
 	/********************************************************
 	 * Enter max n and max k values here to use the program *
 	 ********************************************************/
-	public static int maxN = 3;
-	public static int maxK = 3;
+	public static int maxN = 10;
+	public static int maxK = 6;
+	
+	public static int errors = 0; //number of contructions that are not DB
 	
 	public static long total;
 	
@@ -35,8 +37,6 @@ public class ConstructionTester {
 				
 				System.out.println("Reps found for n = " + n + ", k = " + k);
 				
-				System.out.println(CCR1Construction.reps);
-				
 				CCR2Construction.reps = CCR1Construction.reps;
 				CCR3Construction.reps = CCR1Construction.reps;
 				
@@ -53,13 +53,30 @@ public class ConstructionTester {
 				
 				System.out.println("n = " + n + ", k = " + k + ":");
 				System.out.print("CCR1: ");
-				CCR1Construction.DBChecker(CCR1Construction.sequence);
+				if(!CCR1Construction.DBChecker(CCR1Construction.sequence)) {
+					errors++;
+				}
 				System.out.print("CCR2: ");
-				CCR2Construction.DBChecker(CCR2Construction.sequence);
+				if(!CCR2Construction.DBChecker(CCR1Construction.sequence)) {
+					errors++;
+				}
 				System.out.print("CCR3: ");
-				CCR3Construction.DBChecker(CCR3Construction.sequence);
+				if(!CCR3Construction.DBChecker(CCR1Construction.sequence)) {
+					errors++;
+				}
+				
+				CCR1Construction.reps.clear();
+				CCR1Construction.cycles.clear();
+				
+				CCR1Construction.sequence = "";
+				CCR2Construction.sequence = "";
+				CCR3Construction.sequence = "";
+				
+				System.out.println("\n\n");
 			}
 		}
+		
+		System.out.println("Number of NON-DB sequences constructed: " + errors);
 	}
 	
 	
