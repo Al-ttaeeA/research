@@ -7,8 +7,8 @@ public class CCR2Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 4;
-	public static int k = 5;
+	public static int n = 6;
+	public static int k = 2;
 	
 	public static long total;
 	
@@ -80,7 +80,7 @@ public class CCR2Construction {
 	public static String findChildCCR2(String extString, int index) {
 		int value = extString.charAt(index) - '0'; //get the integer value of the index
 		
-		if(value == k-1) { //if the value is already the highest digit then it has no children
+		if(value == k-1 && value != 0) { //if the value is already the highest digit then it has no children
 			return null;
 		}
 		

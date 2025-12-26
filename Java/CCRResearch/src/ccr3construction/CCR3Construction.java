@@ -9,8 +9,8 @@ public class CCR3Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 7;
-	public static int k = 4;
+	public static int n = 6;
+	public static int k = 2;
 	
 	public static long total;
 	
@@ -93,7 +93,7 @@ public class CCR3Construction {
 		int value = extString.charAt(index) - '0';
 		
 		//If the value is the maximum it cant have children
-		if(value == k-1) {
+		if(value == k-1 && value != 1) {
 			return null;
 		}
 		
@@ -101,7 +101,7 @@ public class CCR3Construction {
 		
 		if(value == 1) {
 			newValue = 0;
-		} else if(value == 0) {
+		} else if(value == 0 && k != 2) {
 			newValue = 2;
 		} else {
 			newValue = value + 1;
