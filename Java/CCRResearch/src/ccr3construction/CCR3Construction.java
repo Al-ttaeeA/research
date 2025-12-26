@@ -20,6 +20,13 @@ public class CCR3Construction {
 	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	
 	public static void main(String[] args) {
+		function();
+	}
+	
+	/****************************
+	 * Main function migrated here to be used with other classes as well
+	 ****************************/
+	public static void function() {
 		total = (long) Math.pow(k, n);
 		findReps();
 		

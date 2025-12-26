@@ -18,6 +18,13 @@ public class CCR2Construction {
 	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	
 	public static void main(String[] args) {
+		function();
+	}
+	
+	/****************************
+	 * Main function migrated here to be used with other classes as well
+	 ****************************/
+	public static void function() {
 		total = (long) Math.pow(k, n);
 		findReps();
 		
@@ -29,9 +36,9 @@ public class CCR2Construction {
 		
 		recursiveConcat(start, changeIndex, traversal);
 		
-		System.out.println(sequence);
-		
-		DBChecker(sequence);
+ 		System.out.println(sequence);
+ 		
+ 		DBChecker(sequence);
 	}
 	
 	/***************************************************
