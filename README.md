@@ -41,9 +41,14 @@ Three programs that test for **periodic parents** under different CCR parent rul
 The results are used to explore structural differences between parent rules and their impact on periodicity.
 
 ### 4. `CCR1Construction.java`, `CCR2Construction.java`, `CCR3Construction.java`
-Three programs that construct a sequence using the concatenation tree framework and the CCR1, CCR2, and CCR3 parent rules respectively, then it checks if the sequence is actually a DB sequence or not
+Three programs that construct a sequence using the concatenation tree framework and the CCR1, CCR2, and CCR3 parent rules respectively, then it checks if the sequence is actually a DB sequence or not.
 
 This construction algorithm is the culmination of the first step of this research project, as it applies the concatenation tree framework on CCR functions.
+
+### 5. `ConstructionTester.java`
+A program that tests all 3 constructions with different values of n and k, upto a max set value of n and k.
+
+This program is mainly designed to easily test the 3 construction classes automatically.
 
 ## What This Repository Is (and Is Not)
 - ✔ A research and experimentation toolkit
