@@ -147,6 +147,23 @@ public class MinDiscrepancy {
 	    return c - '0';
 	}
 	
+	/****************************************
+	 * Method to find the difference array of a length n string based on the Min-Discrepancy algorithm by N. Alvarez, V. Becher, and M. Mereb
+	 * @param str - the length n string to find the difference array of
+	 * @return returns the difference array
+	 ****************************************/
+	public String differenceArray(String str) {
+		String newStr = "";
+		
+		newStr += modK(charToInt(str.charAt(n-1)) - charToInt(str.charAt(0)) - 1);
+		
+		for(int i = 1; i < n; i++) {
+			newStr += modK(charToInt(str.charAt(i-1)) - charToInt(str.charAt(i)));
+		}
+		
+		return newStr;
+	}
+	
 	/***********************
 	 * Method to find number modulo k
 	 * @param num - initial number
