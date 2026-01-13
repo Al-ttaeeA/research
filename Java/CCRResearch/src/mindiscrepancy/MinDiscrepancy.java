@@ -147,6 +147,20 @@ public class MinDiscrepancy {
 	    return c - '0';
 	}
 	
+	/***********************
+	 * Method to find number modulo k
+	 * @param num - initial number
+	 * @return returns the number modulo k
+	 ***********************/
+	public int modK(int num) {
+		int value = num % k;
+		if(value < 0) {
+			value = value + k;
+		}
+		
+		return value;
+	}
+	
 	/*************************************************
 	 * Method to find the least period of a string to concatenate it
 	 * @param extString - the extended string to find the period of
