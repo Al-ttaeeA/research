@@ -91,6 +91,37 @@ public class MinDiscrepancy {
 	 * @return returns the child string OR null if no children were found
 	 **************************************************************/
 	public static String findChild(String extString, int index, int depth) {
+		int value = extString.charAt(index) - '0';
+		
+		int newValue = modK(value - 1);
+		
+		//new value must match depth
+		if(newValue != depth) {
+			return null;
+		}
+		
+		int section = index / n;
+		int sectionIndex = index % n;
+		
+		String subParent = extString.substring(section * n, (section + 1) * n);
+		
+		String subChild = subParent.substring(0, sectionIndex) + newValue + subParent.substring(sectionIndex + 1, n);
+		
+		//System.out.println("subParent: " + subParent + ", subChild: " + subChild);
+		
+		//Get the child shifted, and the representative
+		String child = extendString(subChild); //This is the possible child
+		String childRep = getRep(child);
+		
+		//get the parent of the found child's rep, and the extString rep
+		String foundParentRep = parent(childRep); //This is the actual parent of the possible child
+		String actualParentRep = getRep(extString); //This is the parent we want
+		
+		//If the parent of the found child matches the extString's rep, then it is a child, we need to check if its at the correct index
+		if(actualParentRep.equals(foundParentRep)) {
+			
+		}
+		
 		return null;
 	}
 	
