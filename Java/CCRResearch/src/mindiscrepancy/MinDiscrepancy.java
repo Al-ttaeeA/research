@@ -19,7 +19,7 @@ public class MinDiscrepancy {
 	
 	public static void main(String[] args) {
 		//function();
-		System.out.println(correctDifferenceArray("1221"));
+		System.out.println(leastDifferenceArray("1101"));
 	}
 	
 	/****************************
@@ -60,10 +60,10 @@ public class MinDiscrepancy {
 			//inner loop runs n times
 			for(int index = Math.max(changeIndex + traversal, section * n); index < Math.min(leastLength, ((section + 1) * n)); index++) {
 				//Check child at each index
-				String child = findChild(extString, index);
+				String child = findChild(extString, index, modK(depth+1));
 				
 				if(child != null) {
-					recursiveConcat(child, index % n, traversal);
+					recursiveConcat(child, index % n, traversal, modK(depth+1));
 				}
 			}
 			
@@ -75,10 +75,10 @@ public class MinDiscrepancy {
 		
 		//Left children
 		for(int i = 0; i < changeIndex + traversal; i++) {
-			String child = findChild(extString, i);
+			String child = findChild(extString, i, modK(depth+1));
 			
 			if(child != null) {
-				recursiveConcat(child, i, traversal);
+				recursiveConcat(child, i, traversal, modK(depth+1));
 			}
 		}
 	}
@@ -91,7 +91,7 @@ public class MinDiscrepancy {
 	 * @return returns the child string OR null if no children were found
 	 **************************************************************/
 	public static String findChild(String extString, int index, int depth) {
-		
+		return null;
 	}
 	
 	/**********************************************
@@ -154,15 +154,7 @@ public class MinDiscrepancy {
 	 * @return returns the correct form of the difference array
 	 ******************************************************/
 	public static String correctDifferenceArray(String str) {
-		String diffArr = differenceArray(str);
-		diffArr += diffArr;
-		
-		String lexDiffArr = diffArr;
-		for(int i = 0; i < n; i++) {
-			if(diffArr.substring(i, i+n).compareTo(lexDiffArr) < 0) {
-				lexDiffArr = diffArr.substring(i, i+n);
-			}
-		}
+		String lexDiffArr = leastDifferenceArray(str);
 		
 		//Now we have the lex least rotation, find first non-zero index
 		int i;
@@ -175,6 +167,25 @@ public class MinDiscrepancy {
 		String correctArr = lexDiffArr.substring(i) + lexDiffArr.substring(0, i);
 		
 		return correctArr;
+	}
+	
+	/****************************************************
+	 * Method to find the lex least rotation of the difference array of a string
+	 * @param str - initial n length string
+	 * @return returns the lex least difference array
+	 ****************************************************/
+	public static String leastDifferenceArray(String str) {
+		String diffArr = differenceArray(str);
+		diffArr += diffArr;
+		
+		String lexDiffArr = diffArr;
+		for(int i = 0; i < n; i++) {
+			if(diffArr.substring(i, i+n).compareTo(lexDiffArr) < 0) {
+				lexDiffArr = diffArr.substring(i, i+n);
+			}
+		}
+		
+		return lexDiffArr;
 	}
 	
 	/****************************************
