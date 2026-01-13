@@ -7,8 +7,8 @@ public class MinDiscrepancy {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 6;
-	public static int k = 2;
+	public static int n = 4;
+	public static int k = 3;
 	
 	public static long total;
 	
@@ -18,7 +18,8 @@ public class MinDiscrepancy {
 	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	
 	public static void main(String[] args) {
-		function();
+		//function();
+		System.out.println(correctDifferenceArray("1221"));
 	}
 	
 	/****************************
@@ -147,12 +148,41 @@ public class MinDiscrepancy {
 	    return c - '0';
 	}
 	
+	/******************************************************
+	 * Gets the correct form of the difference array based on the algorithm
+	 * @param str - the n length string
+	 * @return returns the correct form of the difference array
+	 ******************************************************/
+	public static String correctDifferenceArray(String str) {
+		String diffArr = differenceArray(str);
+		diffArr += diffArr;
+		
+		String lexDiffArr = diffArr;
+		for(int i = 0; i < n; i++) {
+			if(diffArr.substring(i, i+n).compareTo(lexDiffArr) < 0) {
+				lexDiffArr = diffArr.substring(i, i+n);
+			}
+		}
+		
+		//Now we have the lex least rotation, find first non-zero index
+		int i;
+		for(i = 0; i < n; i++) {
+			if(lexDiffArr.charAt(i) != '0') {
+				break;
+			}
+		}
+		i++;
+		String correctArr = lexDiffArr.substring(i) + lexDiffArr.substring(0, i);
+		
+		return correctArr;
+	}
+	
 	/****************************************
 	 * Method to find the difference array of a length n string based on the Min-Discrepancy algorithm by N. Alvarez, V. Becher, and M. Mereb
 	 * @param str - the length n string to find the difference array of
 	 * @return returns the difference array
 	 ****************************************/
-	public String differenceArray(String str) {
+	public static String differenceArray(String str) {
 		String newStr = "";
 		
 		newStr += modK(charToInt(str.charAt(n-1)) - charToInt(str.charAt(0)) - 1);
@@ -169,7 +199,7 @@ public class MinDiscrepancy {
 	 * @param num - initial number
 	 * @return returns the number modulo k
 	 ***********************/
-	public int modK(int num) {
+	public static int modK(int num) {
 		int value = num % k;
 		if(value < 0) {
 			value = value + k;
