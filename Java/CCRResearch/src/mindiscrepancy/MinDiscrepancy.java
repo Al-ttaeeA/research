@@ -19,7 +19,7 @@ public class MinDiscrepancy {
 	
 	public static void main(String[] args) {
 		//function();
-		System.out.println(leastDifferenceArray("1101"));
+		System.out.println(parent("012012012012"));
 	}
 	
 	/****************************
@@ -94,6 +94,37 @@ public class MinDiscrepancy {
 		return null;
 	}
 	
+	/*******************************************
+	 * Method to find the parent rep of a child rep string
+	 * @param childRep - the child rep
+	 * @return returns the parent rep or null if the child rep is all 0s
+	 *******************************************/
+	public static String parent(String childRep) {
+		String lexDiffArr = leastDifferenceArray(childRep.substring(0,n));
+		
+		int firstNonZero = 0;
+		int nextDigit = 0;
+		int i;
+		for(i = 0; i < n; i++) {
+			if(lexDiffArr.charAt(i) != '0' && i != n-1) {
+				firstNonZero = charToInt(lexDiffArr.charAt(i));
+				nextDigit = charToInt(lexDiffArr.charAt(i+1));
+				break;
+			}
+		}
+		
+		int newFirstdigit = firstNonZero - 1;
+		int newNextDigit = modK(nextDigit + 1);
+		
+		String parentDiffArr = lexDiffArr.substring(0, i) + newFirstdigit + newNextDigit + lexDiffArr.substring(i+2, n);
+		
+		String parentStr = constructStringFromDiffArr(parentDiffArr);
+		
+		String parentRep = getRep(parentStr);
+		
+		return parentRep;
+	}
+	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
 	 * This algorithm converts every n-length string into a base-k value, and uses the value to keep track of duplicates
@@ -146,6 +177,31 @@ public class MinDiscrepancy {
 
 	private static int charToInt(char c) {
 	    return c - '0';
+	}
+	
+	/**************************************************************
+	 * Method that constructs a kn length string from a given diffArr
+	 * @param diffArr - lex least diffArr
+	 * @return returns the actual string
+	 */
+	public static String constructStringFromDiffArr(String diffArr) {
+		int[] intDiffArr = new int[n];
+		
+		for(int j = 0; j < n; j++) {
+			intDiffArr[j] = charToInt(diffArr.charAt(j));
+		}
+		
+		String first = "0"; //start with 0, concatenate based on the parent diffArr found
+		int prevValue = 0;
+		for(int j = 1; j < n; j++) {
+			prevValue = modK(prevValue - intDiffArr[j]);
+			first += prevValue;
+		}
+		
+		//now we have the first section, extend it
+		String str = extendString(first);
+		
+		return str;
 	}
 	
 	/******************************************************
