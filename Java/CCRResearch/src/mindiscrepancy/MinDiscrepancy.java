@@ -18,8 +18,7 @@ public class MinDiscrepancy {
 	public static HashMap<String, ArrayList<String>> cycles = new HashMap<String, ArrayList<String>>();
 	
 	public static void main(String[] args) {
-		//function();
-		System.out.println(parent("012012012012"));
+		function();
 	}
 	
 	/****************************
@@ -35,10 +34,12 @@ public class MinDiscrepancy {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
+		//System.out.println(findChild("222100021110", 6, 2));
+		
 		recursiveConcat(start, changeIndex, traversal, 0);
 		
  		System.out.println(sequence);
- 		
+		
  		DBChecker(sequence);
 	}
 	
@@ -119,7 +120,33 @@ public class MinDiscrepancy {
 		
 		//If the parent of the found child matches the extString's rep, then it is a child, we need to check if its at the correct index
 		if(actualParentRep.equals(foundParentRep)) {
+			ArrayList<String> childCycles = cycles.get(childRep);
+			int childShift = childCycles.indexOf(child);
 			
+			int leastPeriod = leastPeriod(child).length();
+			
+			int foundChangeIndex = (childShift + sectionIndex) % leastPeriod; //found change index save for later
+			
+			String correctDiffArr = correctDifferenceArray(childRep.substring(0, n));
+			
+			String childRepDup = childRep + childRep.substring(0, n); //extended version of child rep to check each position
+			
+			int i;
+			for(i = 0; i < k*n; i++) {
+				String curSubstring = childRepDup.substring(i, i+n);
+				String curDiffArr = differenceArray(curSubstring);
+				int curValue = charToInt(curSubstring.charAt(n-1));
+				
+				if(curValue == depth && curDiffArr.equals(correctDiffArr)) {
+					break;
+				}
+			}
+			
+			int expectedChangeIndex = (i + n - 1) % (leastPeriod);
+			
+			if(expectedChangeIndex == foundChangeIndex) {
+				return child;
+			}
 		}
 		
 		return null;
@@ -131,6 +158,10 @@ public class MinDiscrepancy {
 	 * @return returns the parent rep or null if the child rep is all 0s
 	 *******************************************/
 	public static String parent(String childRep) {
+		if(childRep.equals(reps.get(0))) {
+			return null;
+		}
+		
 		String lexDiffArr = leastDifferenceArray(childRep.substring(0,n));
 		
 		int firstNonZero = 0;
