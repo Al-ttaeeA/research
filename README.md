@@ -45,7 +45,12 @@ Three programs that construct a sequence using the concatenation tree framework 
 
 This construction algorithm is the culmination of the first step of this research project, as it applies the concatenation tree framework on CCR functions.
 
-### 5. `ConstructionTester.java`
+### 5. `MinDiscrepancy.java`
+A program designed to apply the concatenation tree framework on the min-discrepancy algorithm originally developed by N. Alvarez, V. Becher, and M. Mereb
+
+This program constructs a string that satisfy the min-discrepancy rule set out by the authors of the paper "De Bruijn Sequences with Minimum Discrepancy" and it generates the exact same sequence as the research paper's algorithm by applying the concatenation tree framework.
+
+### 6. `ConstructionTester.java`
 A program that tests all 3 constructions with different values of n and k, upto a max set value of n and k.
 
 This program is mainly designed to easily test the 3 construction classes automatically.
