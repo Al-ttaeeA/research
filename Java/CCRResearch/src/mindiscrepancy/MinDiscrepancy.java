@@ -36,8 +36,6 @@ public class MinDiscrepancy {
 		int traversal = 1; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = n-1;
 		
-		//System.out.println(findChild("222100021110", 6, 2));
-		
 		recursiveConcat(start, changeIndex, traversal, 0);
 		
  		System.out.println(sequence);
@@ -139,6 +137,7 @@ public class MinDiscrepancy {
 			
 			String childRepDup = childRep + childRep.substring(0, n); //extended version of child rep to check each position
 			
+			//Find where the first instance of the correct diff arr + last digit equals depth
 			int i;
 			for(i = 0; i < k*n; i++) {
 				String curSubstring = childRepDup.substring(i, i+n);
@@ -172,6 +171,7 @@ public class MinDiscrepancy {
 		
 		String lexDiffArr = leastDifferenceArray(childRep.substring(0,n));
 		
+		//Get the parent diff array
 		int firstNonZero = 0;
 		int nextDigit = 0;
 		int i;
@@ -188,6 +188,7 @@ public class MinDiscrepancy {
 		
 		String parentDiffArr = lexDiffArr.substring(0, i) + newFirstdigit + newNextDigit + lexDiffArr.substring(i+2, n);
 		
+		//Construct the parent from the diff array
 		String parentStr = constructStringFromDiffArr(parentDiffArr);
 		
 		String parentRep = getRep(parentStr);
