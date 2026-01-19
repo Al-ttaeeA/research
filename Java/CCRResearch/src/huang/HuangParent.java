@@ -7,7 +7,7 @@ public class HuangParent {
 	public static int n = 6;
 	
 	public static void main(String[] args) {
-		System.out.println(parent("001010110101"));
+		System.out.println(parent("001100110011"));
 	}
 	
 	/*******************************************
@@ -17,30 +17,57 @@ public class HuangParent {
 	 *******************************************/
 	public static String parent(String childRep) {
 		String childRepExt = childRep + childRep.substring(0, n);
+		int maxValue = 0;
+		String maxReversePCR = "";
 		
 		for(int i = 0; i < 2*n; i++) {
 			String curSubstring = childRepExt.substring(i, i+n);
 			
-			System.out.println(i + "   " + curSubstring);
-			
-			//Last digit has to be 1
 			if(curSubstring.charAt(n-1) != '1') {
 				continue;
 			}
 			
+			//System.out.println(curSubstring);
+			
 			String curReversePCR = reversePCR(curSubstring);
 			
-			int diffCurSubstring = difference(curSubstring);
+			int diffCur = difference(curSubstring);
 			int diffReversePCR = difference(curReversePCR);
 			
-			System.out.println(curReversePCR + "   " + diffReversePCR + "   " + diffCurSubstring);
+			int valueCur = binaryValue(curSubstring);
 			
-			if(diffReversePCR < diffCurSubstring) {
-				return getRep(curReversePCR);
+			//System.out.println(curReversePCR + "   " + diffCur + "   " + diffReversePCR + "   " + valueCur);
+			
+			if(diffReversePCR < diffCur && valueCur > maxValue) {
+				maxReversePCR = curReversePCR;
+				maxValue = valueCur;
 			}
 		}
 		
-		return null;
+		if(maxReversePCR.equals("")) {
+			return null;
+		}
+		
+		return getRep(maxReversePCR);
+	}
+	
+	/****************************************
+	 * Method to find the binary value of a n-length string
+	 * @param str - the initial string
+	 * @return returns the decimal value of the binary string
+	 ****************************************/
+	public static int binaryValue(String str) {
+		int sum = 0;
+		
+		for(int i = 0; i < n; i++) {
+			sum = sum * 2;
+			
+			if(str.charAt(i) == '1') {
+				sum++;
+			}
+		}
+		
+		return sum;
 	}
 	
 	/***************************************
