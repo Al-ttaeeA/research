@@ -7,7 +7,7 @@ public class HuangParent {
 	public static int n = 6;
 	
 	public static void main(String[] args) {
-		System.out.println(parent("001100110011"));
+		System.out.println(parent("000100111011"));
 	}
 	
 	/*******************************************
@@ -21,7 +21,7 @@ public class HuangParent {
 		String maxReversePCR = "";
 		
 		for(int i = 0; i < 2*n; i++) {
-			String curSubstring = childRepExt.substring(i, i+n);
+			String curSubstring = childRepExt.substring(i, i+n); //Bi*1
 			
 			if(curSubstring.charAt(n-1) != '1') {
 				continue;
@@ -29,7 +29,7 @@ public class HuangParent {
 			
 			//System.out.println(curSubstring);
 			
-			String curReversePCR = reversePCR(curSubstring);
+			String curReversePCR = reversePCR(curSubstring); //Bi
 			
 			int diffCur = difference(curSubstring);
 			int diffReversePCR = difference(curReversePCR);
@@ -41,6 +41,20 @@ public class HuangParent {
 			if(diffReversePCR < diffCur && valueCur > maxValue) {
 				maxReversePCR = curReversePCR;
 				maxValue = valueCur;
+			}
+			
+			//Condition g)
+			if(diffReversePCR == diffCur && valueCur > maxValue) {
+				String curComplement = curSubstring.substring(1) + complement(curSubstring.charAt(0)); //Bi*2
+			
+				int diffCurComplement = difference(curComplement);
+				
+				int valueCurComplement = binaryValue(curComplement);
+				
+				if(diffCurComplement == diffCur && valueCurComplement > maxValue) {
+					maxReversePCR = curReversePCR;
+					maxValue = valueCurComplement;
+				}
 			}
 		}
 		
