@@ -4,21 +4,27 @@ public class MinDiscrepancyOptimal {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 4;
-	public static int k = 3;
+	public static int n = 8;
+	public static int k = 6;
 	
 	public static long total;
 	
 	public static String sequence = ""; //The entire sequence will be concatenated here using recursion
 	
 	public static void main(String[] args) {
-		System.out.println(findChild("221200201101", 4, 2));
+		String start = "";
 		
-//		recursiveConcat("000011112222", 3, 1, 0);
-//		
-//		System.out.println(sequence);
-//		
-//		DBChecker(sequence);
+		for(int i = 0; i < n; i++) {
+			start += "0";
+		}
+		
+		start = extendString(start);
+		
+		recursiveConcat(start, 3, 1, 0);
+		
+		System.out.println(sequence);
+		
+		DBChecker(sequence);
 	}
 	
 	/***************************************************
@@ -92,14 +98,33 @@ public class MinDiscrepancyOptimal {
 		
 		String foundParentDiffArr = parentDiffArr(childDiffArr);
 		
-		System.out.println(foundParentDiffArr + "   " + parentDiffArr + "   " + childDiffArr);
+		//System.out.println(foundParentDiffArr + "   " + parentDiffArr + "   " + childDiffArr);
 		
 		if(foundParentDiffArr == null) {
 			return null;
 		}
 		
 		if(foundParentDiffArr.equals(parentDiffArr)) {
-			return extendString(subChild);
+			String child = extendString(subChild);
+			String curChild = "";
+			
+			if(index < n) {
+				for(int i = index+1; i < n; i++) {
+					curChild += modK(charToInt(child.charAt(i)) - 1);
+				}
+				curChild += child.substring(0, index+1);
+			}
+			else {
+				curChild += child.substring(index-n+1, index+1);
+			}
+			
+			String curChildDiffArr = differenceArray(curChild);
+			
+			String correctDiffArr = correctDifferenceArray(subChild);
+			
+			if(curChildDiffArr.equals(correctDiffArr)) {
+				return child;
+			}
 		}
 		
 		return null;
@@ -127,7 +152,15 @@ public class MinDiscrepancyOptimal {
 		
 		String parentDiffArr = childDiffArr.substring(0, i) + newFirstdigit + newNextDigit + childDiffArr.substring(i+2, n);
 		
-		return parentDiffArr;
+		String lexDiffArr = parentDiffArr;
+		parentDiffArr += parentDiffArr;
+		for(int j = 0; j < n; j++) {
+			if(parentDiffArr.substring(j, j+n).compareTo(lexDiffArr) < 0) {
+				lexDiffArr = parentDiffArr.substring(j, j+n);
+			}
+		}
+		
+		return lexDiffArr;
 	}
 	
 	
@@ -146,10 +179,10 @@ public class MinDiscrepancyOptimal {
 	    for (int i = 0; i < n; i++) total *= k;
 
 	    // Length check
-//	    if (testStr.length() != total) {
-//	    	System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
-//	        return false;
-//	    }
+	    if (testStr.length() != total) {
+	    	System.out.println("Not DB, doesn't satisfy length requirements, length: " + testStr.length() + ", expected: " + total);
+	        return false;
+	    }
 
 	    // Seen substrings
 	    boolean[] seen = new boolean[total];
