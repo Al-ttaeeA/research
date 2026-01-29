@@ -4,8 +4,8 @@ public class MinDiscrepancyOptimal {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 8;
-	public static int k = 6;
+	public static int n = 6;
+	public static int k = 4;
 	
 	public static long total;
 	
@@ -44,6 +44,15 @@ public class MinDiscrepancyOptimal {
 		for(int section = 0; section < Math.min((leastLength / n) + 1, k); section++) {
 			//inner loop runs n times
 			for(int index = Math.max(changeIndex + traversal, section * n); index < Math.min(leastLength, ((section + 1) * n)); index++) {
+				int value = extString.charAt(index) - '0';
+				
+				int newValue = modK(value - 1);
+				
+				//new value must match depth
+				if(newValue != modK(depth+1)) {
+					continue;
+				}
+				
 				//Check child at each index
 				String child = findChild(extString, index, modK(depth+1));
 				
@@ -60,6 +69,15 @@ public class MinDiscrepancyOptimal {
 		
 		//Left children
 		for(int i = 0; i < changeIndex + traversal; i++) {
+			int value = extString.charAt(i) - '0';
+			
+			int newValue = modK(value - 1);
+			
+			//new value must match depth
+			if(newValue != modK(depth+1)) {
+				continue;
+			}
+			
 			String child = findChild(extString, i, modK(depth+1));
 			
 			if(child != null) {
@@ -79,11 +97,6 @@ public class MinDiscrepancyOptimal {
 		int value = extString.charAt(index) - '0';
 		
 		int newValue = modK(value - 1);
-		
-		//new value must match depth
-		if(newValue != depth) {
-			return null;
-		}
 		
 		int section = index / n;
 		int sectionIndex = index % n;
@@ -329,8 +342,10 @@ public class MinDiscrepancyOptimal {
 		if(extendedStr.length() == k*n) return extendedStr;
 		
 		//extend the string
-		for(int i = 0; i < (k-1) * n; i++) {
-			extendedStr += nextChar(extendedStr.substring(i));
+		for(int k2 = 1; k2 < k; k2++) {
+			for(int n2 = 0; n2 < n; n2++) {
+				extendedStr += modK(extendedStr.charAt(n2) + k2);
+			}
 		}
 		
 		return extendedStr;
