@@ -4,12 +4,12 @@ public class MinDiscrepancyOptimal {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 6;
-	public static int k = 4;
+	public static int n = 8;
+	public static int k = 6;
 	
 	public static long total;
 	
-	public static String sequence = ""; //The entire sequence will be concatenated here using recursion
+	public static StringBuilder sequence = new StringBuilder(); //The entire sequence will be concatenated here using recursion
 	
 	public static void main(String[] args) {
 		String start = "";
@@ -24,7 +24,7 @@ public class MinDiscrepancyOptimal {
 		
 		System.out.println(sequence);
 		
-		DBChecker(sequence);
+		DBChecker(sequence.toString());
 	}
 	
 	/***************************************************
@@ -38,7 +38,7 @@ public class MinDiscrepancyOptimal {
 		String least = leastPeriod(extString);
 		int leastLength = least.length();
 		
-		sequence += " ";
+		sequence.append(" ");
 		
 		//outer loop runs for each n-length section
 		for(int section = 0; section < Math.min((leastLength / n) + 1, k); section++) {
@@ -62,10 +62,10 @@ public class MinDiscrepancyOptimal {
 			}
 			
 			//After checking right children of each section, concatenate the section
-			sequence += least.substring(section * n, Math.min(leastLength, ((section + 1) * n)));
+			sequence.append(least.substring(section * n, Math.min(leastLength, ((section + 1) * n))));
 		}
 		
-		sequence += " ";
+		sequence.append(" ");
 		
 		//Left children
 		for(int i = 0; i < changeIndex + traversal; i++) {
@@ -119,19 +119,18 @@ public class MinDiscrepancyOptimal {
 		
 		if(foundParentDiffArr.equals(parentDiffArr)) {
 			String child = extendString(subChild);
-			String curChild = "";
+			StringBuilder curChild = new StringBuilder();
 			
 			if(index < n) {
-				for(int i = index+1; i < n; i++) {
-					curChild += modK(charToInt(child.charAt(i)) - 1);
-				}
-				curChild += child.substring(0, index+1);
-			}
-			else {
-				curChild += child.substring(index-n+1, index+1);
+			    for(int i = index+1; i < n; i++) {
+			        curChild.append(modK(charToInt(child.charAt(i)) - 1));
+			    }
+			    curChild.append(child, 0, index+1);
+			} else {
+			    curChild.append(child, index-n+1, index+1);
 			}
 			
-			String curChildDiffArr = differenceArray(curChild);
+			String curChildDiffArr = differenceArray(curChild.toString());
 			
 			String correctDiffArr = correctDifferenceArray(subChild);
 			
@@ -143,6 +142,11 @@ public class MinDiscrepancyOptimal {
 		return null;
 	}
 	
+	/******************************************************
+	 * Method to find the parent diff array of a child diff array
+	 * @param childDiffArr - the child diff array
+	 * @return returns the lex-least rotation of the parent diff array
+	 ******************************************************/
 	public static String parentDiffArr(String childDiffArr) {
 		//Get the parent diff array
 		int firstNonZero = 0;
@@ -165,19 +169,10 @@ public class MinDiscrepancyOptimal {
 		
 		String parentDiffArr = childDiffArr.substring(0, i) + newFirstdigit + newNextDigit + childDiffArr.substring(i+2, n);
 		
-		String lexDiffArr = parentDiffArr;
-		parentDiffArr += parentDiffArr;
-		for(int j = 0; j < n; j++) {
-			if(parentDiffArr.substring(j, j+n).compareTo(lexDiffArr) < 0) {
-				lexDiffArr = parentDiffArr.substring(j, j+n);
-			}
-		}
+		String lexDiffArr = lexLeast(parentDiffArr);
 		
 		return lexDiffArr;
 	}
-	
-	
-	
 	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
@@ -255,22 +250,45 @@ public class MinDiscrepancyOptimal {
 	}
 	
 	/****************************************************
-	 * Method to find the lex least rotation of the difference array of a string
+	 * Method to find the lex least rotation of the difference array of a string - based on Booth's algorithm with O(n)
 	 * @param str - initial n length string
 	 * @return returns the lex least difference array
 	 ****************************************************/
 	public static String leastDifferenceArray(String str) {
 		String diffArr = differenceArray(str);
-		diffArr += diffArr;
 		
-		String lexDiffArr = diffArr;
-		for(int i = 0; i < n; i++) {
-			if(diffArr.substring(i, i+n).compareTo(lexDiffArr) < 0) {
-				lexDiffArr = diffArr.substring(i, i+n);
-			}
-		}
+		return lexLeast(diffArr);
+	}
+	
+	/****************************************
+	 * Method to find the lex least rotation of a string based on Booth's algorithm
+	 * @param str - the initial string
+	 * @return returns the lex least rotation of the string
+	 ****************************************/
+	public static String lexLeast(String str) {
+		String ss = str + str;
 		
-		return lexDiffArr;
+		int i = 0, j = 1, m = 0;
+		
+		while (i < n && j < n && m < n) {
+	        char a = ss.charAt(i + m);
+	        char b = ss.charAt(j + m);
+
+	        if (a == b) {
+	            m++;
+	        } else if (a > b) {
+	            i = i + m + 1;
+	            if (i <= j) i = j + 1;
+	            m = 0;
+	        } else {
+	            j = j + m + 1;
+	            if (j <= i) j = i + 1;
+	            m = 0;
+	        }
+	    }
+		
+		int start = Math.min(i, j);
+	    return ss.substring(start, start + n);
 	}
 	
 	/****************************************
@@ -279,15 +297,15 @@ public class MinDiscrepancyOptimal {
 	 * @return returns the difference array
 	 ****************************************/
 	public static String differenceArray(String str) {
-		String newStr = "";
+		StringBuilder newStr = new StringBuilder();
 		
-		newStr += modK(charToInt(str.charAt(n-1)) - charToInt(str.charAt(0)) - 1);
+		newStr.append(modK(charToInt(str.charAt(n-1)) - charToInt(str.charAt(0)) - 1));
 		
 		for(int i = 1; i < n; i++) {
-			newStr += modK(charToInt(str.charAt(i-1)) - charToInt(str.charAt(i)));
+		    newStr.append(modK(charToInt(str.charAt(i-1)) - charToInt(str.charAt(i))));
 		}
 		
-		return newStr;
+		return newStr.toString();
 	}
 	
 	/***********************
@@ -305,30 +323,32 @@ public class MinDiscrepancyOptimal {
 	}
 	
 	/*************************************************
-	 * Method to find the least period of a string to concatenate it
+	 * Method to find the least period of a string to concatenate it - based entirely on the KMP algorithm
 	 * @param extString - the extended string to find the period of
 	 * @return returns the least period
 	 *************************************************/
 	public static String leastPeriod(String extString) {
-		//For loop to loop through all possible periodic lengths
-		for(int len = 1; len <= k*n / 2; len++) {
-			if(k*n % len == 0) {
-				//pick the first substring and compare if it actually periodically concatenates to make the extString
-				String period = extString.substring(0, len);
-				String newString = "";
-				
-				int repetition = k*n / len;
-				for(int i = 0; i < repetition; i++) {
-					newString += period;
-				}
-				
-				if(extString.equals(newString)) {
-					return period;
-				}
-			}
-		}
-		
-		return extString;
+		int kn = extString.length();
+        int[] pi = new int[kn];
+        
+        // Build the prefix function (KMP)
+        for (int i = 1; i < kn; i++) {
+            int j = pi[i - 1];
+            while (j > 0 && extString.charAt(i) != extString.charAt(j)) {
+                j = pi[j - 1];
+            }
+            if (extString.charAt(i) == extString.charAt(j)) {
+                j++;
+            }
+            pi[i] = j;
+        }
+
+        int periodLength = kn - pi[kn - 1];
+        if (kn % periodLength != 0) {
+            periodLength = kn;  // The whole string is the period
+        }
+
+        return extString.substring(0, periodLength);
 	}
 	
 	/********************************************
@@ -337,18 +357,18 @@ public class MinDiscrepancyOptimal {
 	 * @return returns the extended form of the string
 	 ********************************************/
 	public static String extendString(String str) {
-		String extendedStr = str; //start with the string
+		StringBuilder extendedStr = new StringBuilder(str); //start with the string itself
 		
-		if(extendedStr.length() == k*n) return extendedStr;
+		if(extendedStr.length() == k*n) return extendedStr.toString();
 		
 		//extend the string
 		for(int k2 = 1; k2 < k; k2++) {
 			for(int n2 = 0; n2 < n; n2++) {
-				extendedStr += modK(extendedStr.charAt(n2) + k2);
+				extendedStr.append(modK(extendedStr.charAt(n2) + k2));
 			}
 		}
 		
-		return extendedStr;
+		return extendedStr.toString();
 	}
 	
 	/****************************************
