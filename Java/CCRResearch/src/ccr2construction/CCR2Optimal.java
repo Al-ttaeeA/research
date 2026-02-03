@@ -1,15 +1,13 @@
 package ccr2construction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class CCR2Optimal {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 6;
-	public static int k = 2;
+	public static int n = 8;
+	public static int k = 8;
 	
 	public static long total;
 	
@@ -65,7 +63,7 @@ public class CCR2Optimal {
 		}
 		
 		sequence += " ";
-		sequence += leastPeriod(extString);
+		sequence += leastPeriod(extendString(extString));
 		sequence += " ";
 		
 		//check left children
@@ -105,10 +103,8 @@ public class CCR2Optimal {
 			firstSection.append(newValue);
 			firstSection.append(extString, index+1, n);
 			
-			String newExtended = extendString(firstSection.toString()); //find extended version of possible child
-			
-			if(reps.contains(newExtended)) { //IF the extended possible child is a conecklace then it is a valid child
-				return newExtended;
+			if(reps.contains(firstSection.toString())) { //IF the extended possible child is a conecklace then it is a valid child
+				return firstSection.toString();
 			}
 		}
 		
@@ -180,17 +176,19 @@ public class CCR2Optimal {
 		
 		int currentStringCount = 0;
 		
-		for(int i = 0; i < total; i++) {
+		int i;
+		
+		for(i = 0; i < total; i++) {
 			String rep = getRep(currentStr);
 			
-			if(reps.contains(rep)) { //if the representative is in the hashmap then move to the next one
+			if(reps.contains(rep.substring(0, n))) { //if the representative is in the hashmap then move to the next one
 				currentStr = nextLex(currentStr);
 				continue;
 			}
 			
 			currentStringCount += leastPeriod(rep).length();
 			
-			reps.add(rep);
+			reps.add(rep.substring(0, n));
 			
 			if(currentStringCount == total) {
 				break;
@@ -198,6 +196,8 @@ public class CCR2Optimal {
 			
 			 currentStr = nextLex(currentStr);
 		}
+		
+		System.out.println(i);
 	}
 	
 	/*************************************************
@@ -251,7 +251,7 @@ public class CCR2Optimal {
 		
 		int i = 0, j = 1, m = 0;
 		
-		while (i < n && j < n && m < n) {
+		while (i < k*n && j < k*n && m < k*n) {
 	        char a = ss.charAt(i + m);
 	        char b = ss.charAt(j + m);
 
@@ -269,7 +269,7 @@ public class CCR2Optimal {
 	    }
 		
 		int start = Math.min(i, j);
-	    return ss.substring(start, start + n);
+	    return ss.substring(start, start + k*n);
 	}
 	
 	/********************************************
