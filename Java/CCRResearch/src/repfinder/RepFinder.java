@@ -6,7 +6,7 @@ public class RepFinder {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 8;
+	public static int n = 6;
 	public static int k = 2;
 	
 	
