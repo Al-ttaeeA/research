@@ -2,46 +2,20 @@ package prefsame;
 
 import java.util.ArrayList;
 
-class parentReturn {
-	public String child;
-	public String parentRunlength;
-	public int changeIndex;
-	
-	parentReturn(String child, String parentRunlength, int changeIndex){
-		this.child = child;
-		this.parentRunlength = parentRunlength;
-		this.changeIndex = changeIndex;
-	}
-	
-	public String toString() {
-		return "{" + child + " , " + parentRunlength + " , " + changeIndex + "}";
-	}
-}
-
-class conflictPair {
-	public int index;
-	public int digit;
-	
-	conflictPair(int index, int digit){
-		this.index = index;
-		this.digit = digit;
-	}
-}
-
-public class PrefSameConstruction {
+public class LexCompOptimal {
 	/*****************************************
 	 * Enter n value here to use the program *
 	 *****************************************/
-	public static int n = 14;
+	public static int n = 7;
 	
 	public static int k = 2;
 	
 	public static long total;
 	
 	public static String sequence = ""; //The entire sequence will be concatenated here using recursion
-	
+
 	public static String actual = ""
-			+ ""
+			+ "0101010111111110000000011111101111100111110100000010000011000001011110001111001000011100001101111011000010011110101110001000111011100110001100111001011101101110100111010100001010001101000100100010110001010110011011001010011001001101011011010010010110101010"
 			+ "";
 	
 	public static String defaultString = "";
@@ -113,8 +87,6 @@ public class PrefSameConstruction {
 			return;
 		}
 		
-		//System.out.println(sequence + ", current: " + extString);
-		
 		String least = leastPeriod(extString);
 		int leastLength = least.length();
 		
@@ -123,12 +95,15 @@ public class PrefSameConstruction {
 		//outer loop runs for each n-length section
 		for(int section = 0; section < Math.min((leastLength / n) + 1, k); section++) {
 			//inner loop runs n times
-			for(int index = Math.max(changeIndex + traversal, section * n); index < Math.min(leastLength, ((section + 1) * n)); index++) {
+			for(int index = changeIndex + traversal + section * n; index < Math.min(leastLength, ((section + 1) * n)); index++) {
 				//Check child at each index
 				String child = findChild(extString, index, CCR);
 				
 				if(child != null) {
 					recursiveConcat(child, index % n, traversal, !CCR);
+				}
+				else if (index != changeIndex + section * n) {
+					break;
 				}
 			}
 			
@@ -177,26 +152,16 @@ public class PrefSameConstruction {
 			childRunlength = parentRunlength;
 		}
 		else {
-			//System.out.println(parentRunlength);
-			
 			childRunlength += parentRunlength.substring(0, i-1);
-			
-			//System.out.println(childRunlength);
 			
 			int newRunlengthDigit = charToInt(parentRunlength.charAt(i-1)) + charToInt(parentRunlength.charAt(i));
 			
 			childRunlength += (char)(newRunlengthDigit + '0');
 			
-			//System.out.println(childRunlength);
-			
 			childRunlength += parentRunlength.substring(i+1);
-			
-			//System.out.println(childRunlength);
 			
 			subChild = constructStringFromRunlength(childRunlength, firstValue);
 		}
-		
-		//System.out.println(subChild + "   " + childRunlength);
 		
 		parentReturn parentReturnValue = parent(subChild, CCR);
 		String expectedChild = parentReturnValue.child;
@@ -224,8 +189,6 @@ public class PrefSameConstruction {
 	public static parentReturn parent(String subChild, boolean CCR) {
 		String rotated = subChild;
 		
-		//System.out.println(subChild);
-		
 		int rotations = 0;
 		//Get to the correct form for runlength
 		if(CCR) {
@@ -243,14 +206,10 @@ public class PrefSameConstruction {
 		
 		String runlength = getRunlength(rotated);
 		
-		//System.out.println(rotated + "   " + runlength);
-		
 		if(!CCR) {
 			runlength += runlength;
 			rotated = extendCCR(rotated);
 		}
-		
-		//System.out.println(runlength + "   " + rotated);
 		
 		int currentIndex = 0;
 		int largest = 0;
@@ -269,23 +228,12 @@ public class PrefSameConstruction {
 				conflict = false;
 			}
 			else if(curDigit == largest) {
-//				if(rotated.charAt(currentIndex) == '1' && largestDigit == 0) {
-//					largestIndex = i;
-//					largest = curDigit;
-//					largestDigit = charToInt(rotated.charAt(currentIndex));
-//					conflictIndices.clear();
-//					conflict = false;
-//				}
-//				else 
 				conflictIndices.add(new conflictPair(i, charToInt(rotated.charAt(currentIndex))));
 				conflict = true;
-				
 			}
 			
 			currentIndex += curDigit;
 		}
-		
-		//System.out.println(largestIndex + "   " + largest + "   " + largestDigit);
 		
 		String parentRunlength = "";
 		
@@ -301,9 +249,7 @@ public class PrefSameConstruction {
 			rotatedIndex += charToInt(runlength.charAt(i));
 		}
 		
-		//System.out.println(childRunlength);
 		String child = constructStringFromRunlength(childRunlength, largestDigit);
-		
 		
 		if(conflict) {
 			for(int i = 0; i < conflictIndices.size(); i++) {
@@ -334,8 +280,6 @@ public class PrefSameConstruction {
 			}
 		}
 		
-		//System.out.println(childRunlength + "   " + child);
-		
 		int changeIndex;
 		for(changeIndex = childRunlength.length() - 1; changeIndex > 0; changeIndex--) {
 			if(childRunlength.charAt(changeIndex) != '1') break;
@@ -343,14 +287,10 @@ public class PrefSameConstruction {
 		
 		int changeValue = charToInt(childRunlength.charAt(changeIndex));
 		
-		//System.out.println(changeValue + "   " + changeIndex);
-		
 		parentRunlength += childRunlength.substring(0, changeIndex);
 		parentRunlength += (char) (changeValue - 1 + '0');
 		parentRunlength += '1';
 		parentRunlength += childRunlength.substring(changeIndex+1);
-		
-		//System.out.println(parentRunlength);
 		
 		//Finding change index to compare later
 		int stringChangeIndex = -1;
@@ -358,7 +298,6 @@ public class PrefSameConstruction {
 			stringChangeIndex += charToInt(childRunlength.charAt(i));
 		}
 		
-		//System.out.println(stringChangeIndex + "   " + rotations + "   " + rotatedIndex);
 		int actualIndex = (stringChangeIndex + rotations + rotatedIndex) % n;
 		
 		for(int i = 0; i < (n - (rotations + rotatedIndex) % n); i++) {
@@ -367,8 +306,6 @@ public class PrefSameConstruction {
 		
 		return new parentReturn(child, parentRunlength, actualIndex);
 	}
-	
-	
 	
 	
 	/**********************************************************************************
@@ -427,8 +364,43 @@ public class PrefSameConstruction {
 	    return result.toString();
 	}
 	
-	
-	
+	/******************************
+	 * Method used to compare the found DB sequence to the actual minDiscrepancy sequence
+	 * @return return true if same, false if different
+	 ******************************/
+	public static boolean compare() {
+	    String testStr = sequence.replace(" ", "")
+	                             .replace("\\", "")
+	                             .replace("·", "");
+
+	    int minLen = Math.min(testStr.length(), actual.length());
+	    boolean equal = true;
+
+	    for (int i = 0; i < minLen; i++) {
+	        if (testStr.charAt(i) != actual.charAt(i)) {
+	            equal = false;
+
+	            System.out.println("Difference at index " + i +
+	                               " -> testStr: " + testStr.charAt(i) +
+	                               ", actual: " + actual.charAt(i));
+
+	            int start = Math.max(0, i - n + 1);
+	            String window = testStr.substring(start, i + 1);
+
+	            System.out.println("Window (length ≤ " + n + "): " + window);
+	        }
+	    }
+
+	    // Handle different lengths
+	    if (testStr.length() != actual.length()) {
+	        equal = false;
+	        System.out.println("Strings have different lengths.");
+	        System.out.println("testStr length: " + testStr.length());
+	        System.out.println("actual length: " + actual.length());
+	    }
+
+	    return equal;
+	}
 	
 	/**********************************************
 	 * Method to check if a string is a DB sequence for a specific n,k universe
@@ -486,73 +458,33 @@ public class PrefSameConstruction {
 	    return c - '0';
 	}
 	
-	/******************************
-	 * Method used to compare the found DB sequence to the actual minDiscrepancy sequence
-	 * @return return true if same, false if different
-	 ******************************/
-	public static boolean compare() {
-	    String testStr = sequence.replace(" ", "")
-	                             .replace("\\", "")
-	                             .replace("·", "");
-
-	    int minLen = Math.min(testStr.length(), actual.length());
-	    boolean equal = true;
-
-	    for (int i = 0; i < minLen; i++) {
-	        if (testStr.charAt(i) != actual.charAt(i)) {
-	            equal = false;
-
-	            System.out.println("Difference at index " + i +
-	                               " -> testStr: " + testStr.charAt(i) +
-	                               ", actual: " + actual.charAt(i));
-
-	            int start = Math.max(0, i - n + 1);
-	            String window = testStr.substring(start, i + 1);
-
-	            System.out.println("Window (length ≤ " + n + "): " + window);
-	        }
-	    }
-
-	    // Handle different lengths
-	    if (testStr.length() != actual.length()) {
-	        equal = false;
-	        System.out.println("Strings have different lengths.");
-	        System.out.println("testStr length: " + testStr.length());
-	        System.out.println("actual length: " + actual.length());
-	    }
-
-	    return equal;
-	}
-	
-	
-	
-	
-	
 	/*************************************************
-	 * Method to find the least period of a string to concatenate it
+	 * Method to find the least period of a string to concatenate it - based entirely on the KMP algorithm
 	 * @param extString - the extended string to find the period of
 	 * @return returns the least period
 	 *************************************************/
 	public static String leastPeriod(String extString) {
-		//For loop to loop through all possible periodic lengths
-		for(int len = 1; len <= extString.length() / 2; len++) {
-			if(k*n % len == 0) {
-				//pick the first substring and compare if it actually periodically concatenates to make the extString
-				String period = extString.substring(0, len);
-				String newString = "";
-				
-				int repetition = extString.length() / len;
-				for(int i = 0; i < repetition; i++) {
-					newString += period;
-				}
-				
-				if(extString.equals(newString)) {
-					return period;
-				}
-			}
-		}
-		
-		return extString;
+		int kn = extString.length();
+        int[] pi = new int[kn];
+        
+        // Build the prefix function (KMP)
+        for (int i = 1; i < kn; i++) {
+            int j = pi[i - 1];
+            while (j > 0 && extString.charAt(i) != extString.charAt(j)) {
+                j = pi[j - 1];
+            }
+            if (extString.charAt(i) == extString.charAt(j)) {
+                j++;
+            }
+            pi[i] = j;
+        }
+
+        int periodLength = kn - pi[kn - 1];
+        if (kn % periodLength != 0) {
+            periodLength = kn;  // The whole string is the period
+        }
+
+        return extString.substring(0, periodLength);
 	}
 	
 	/***********************
@@ -575,16 +507,18 @@ public class PrefSameConstruction {
 	 * @return returns the extended form of the string
 	 ********************************************/
 	public static String extendCCR(String str) {
-		String extendedStr = str; //start with the string
+		StringBuilder extendedStr = new StringBuilder(str); //start with the string itself
 		
-		if(extendedStr.length() == k*n) return extendedStr;
+		if(extendedStr.length() == k*n) return extendedStr.toString();
 		
 		//extend the string
-		for(int i = 0; i < (k-1) * n; i++) {
-			extendedStr += nextChar(extendedStr.substring(i));
+		for(int k2 = 1; k2 < k; k2++) {
+			for(int n2 = 0; n2 < n; n2++) {
+				extendedStr.append(modK(extendedStr.charAt(n2) + k2));
+			}
 		}
 		
-		return extendedStr;
+		return extendedStr.toString();
 	}
 	
 	/****************************************
@@ -610,4 +544,5 @@ public class PrefSameConstruction {
 		
 		return newStr;
 	}
+
 }
