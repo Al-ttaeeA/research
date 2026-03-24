@@ -29,17 +29,24 @@ class Node {
 	}
 	
 	public boolean inCycle(String str) {
-		if(CycleTreeConstruction.findRep(str).equals(rep)) {
-			return true;
+		String cycle = rep.substring(0, CycleTreeConstruction.n - 1);
+		
+		for(int i = 0; i < CycleTreeConstruction.n; i++) {
+			if(str.equals(cycle)) {
+				return true;
+			}
+			
+			System.out.println(cycle + "   " + str);
+			
+			cycle = CycleTreeConstruction.nextRotation(cycle);
 		}
-		else {
-			return false;
-		}
+		
+		return false;
 	}
 	
 	public boolean isParent(String str) {
 		if(parent != null) {
-			if(parent.rep.equals(str)) {
+			if(parent.inCycle(str)) {
 				return true;
 			}
 			else {
@@ -72,7 +79,7 @@ class Node {
 public class CycleTreeConstruction {
 	public static int n = 4;
 	
-	public static String UC = "123124132134214324314234";
+	public static String UC = "432142132413423412312431";
 	
 	public static HashMap<String, Node> map = new HashMap<String, Node>();
 	
@@ -82,11 +89,7 @@ public class CycleTreeConstruction {
 	}
 	
 	public static void function() {
-		String start = "";
-		
-		for(int i = 1; i < n; i++) {
-			start += i;
-		}
+		String start = "432";
 		
 		String startExtended = start + missingSymbol(start);
 		
@@ -102,7 +105,7 @@ public class CycleTreeConstruction {
 			String window = UCextended.substring(i, n-1 + i);
 			
 			if(!current.inCycle(window)) {
-				System.out.println("\n\n\nWindow not in current node: " + current.rep);
+				System.out.println("\n\n\nWindow not in current node: " + current.rep + "   at i:" + i);
 				System.exit(0);
 			}
 			
@@ -114,37 +117,51 @@ public class CycleTreeConstruction {
 			char expected = missingSymbol(window);
 			char actual = UCextended.charAt(n-1+i);
 			
+			System.out.println("\n\n" + i + ": window: " + window + ", actual/expected: " + actual + " / " + expected);
+			
 			if(expected != actual) { // We changed cycles
 				String newWindow = window.substring(1) + actual;
 				
 				String newRep = findRep(newWindow);
 				
-				if(current.isParent(newRep)) { // If the new window is from the parent
-					if(current.canVisit()) { // If were not done with the current node theres an error
-						System.out.println("\n\n\nNot done with node: " + current.rep);
-						System.exit(0);
-					}
+				System.out.println(i + ": New rep: " + newRep + ", current parent: " + current.parent);
+				
+				if(current.isParent(newWindow)) { // If the new window is from the parent
+//					if(current.canVisit()) { // If were not done with the current node theres an error
+//						System.out.println("\n\n\nNot done with node: " + current.rep);
+//						System.exit(0);
+//					}
 					
-					current = current.parent;
+					System.out.println(i + ": PARENT, Parent node: " + map.get(current.parent.rep));
+					
+					current = map.get(current.parent.rep);
 				}
 				else { // If the new window is from the child
+					if(map.containsKey(newRep)) {
+//						System.out.println("\n\nCHILD ALREADY VISITED!");
+//						System.out.println(i + ": Current: " + current.rep + ", current parent: " + current.parent.rep);
+//						System.out.println(i + ": CHILD: " + map.get(current));
+//						break;
+						current = map.get(newRep);
+						continue;
+					}
+					
 					Node newChild = new Node(newRep, current);
 					
 					map.put(newRep, newChild);
 					
 					current.addChild(newChild);
 					
+					System.out.println(i + ": CHILD, Child node: " + newChild);
+					
 					current = newChild;
 				}
 			}
 		}
 		
-		if(current != startNode) {
-			System.out.println("\n\n\nCouldnt reach start node");
-			System.exit(0);
-		}
+		System.out.println("\n\n\n\n");
 		
-		current.print();
+		startNode.print();
 	}
 	
 	
