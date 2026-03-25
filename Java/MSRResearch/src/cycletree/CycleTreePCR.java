@@ -78,10 +78,10 @@ class NodePCR {
 }
 
 public class CycleTreePCR {
-	public static int n = 4;
+	public static int n = 3;
 	
 	public static String UC = ""
-			+ "123412351243124513241325134213452135214321452314231524153215342514352435142531453245312541354215432543154235412534152345"
+			+ "432142134132431241234231"
 			+ ""
 			+ "";
 	
@@ -93,7 +93,7 @@ public class CycleTreePCR {
 	}
 	
 	public static void function() {
-		String start = "1234";
+		String start = "4";
 		
 		NodePCR startNode = new NodePCR(start, null);
 		

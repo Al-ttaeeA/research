@@ -77,11 +77,15 @@ class Node {
 }
 
 public class CycleTreeConstruction {
-	public static int n = 4;
+	public static int n = 5;
 	
-	public static String UC = "432142132413423412312431";
+	public static String UC = ""
+			+ "543215321452143514235421352134513425341254132513245324152431543125312451243524135412351234523415342154231523145314251432"
+			+ "";
 	
 	public static HashMap<String, Node> map = new HashMap<String, Node>();
+	
+	public static boolean error = false;
 	
 	public static void main(String[] args) {
 		//System.out.println(findRep("341"));
@@ -89,7 +93,7 @@ public class CycleTreeConstruction {
 	}
 	
 	public static void function() {
-		String start = "432";
+		String start = "5432";
 		
 		String startExtended = start + missingSymbol(start);
 		
@@ -142,6 +146,10 @@ public class CycleTreeConstruction {
 //						System.out.println(i + ": Current: " + current.rep + ", current parent: " + current.parent.rep);
 //						System.out.println(i + ": CHILD: " + map.get(current));
 //						break;
+						
+						//if at any point, a previously visited node is visited again from a non-child, inform the user
+						error = true;
+						
 						current = map.get(newRep);
 						continue;
 					}
@@ -162,6 +170,10 @@ public class CycleTreeConstruction {
 		System.out.println("\n\n\n\n");
 		
 		startNode.print();
+		
+		if(error) {
+			System.out.println("\nThere was a node visited from neither its child nor parent");
+		}
 	}
 	
 	
@@ -169,7 +181,7 @@ public class CycleTreeConstruction {
 	
 	public static String lexLeastMSR(String str) {
 		String lex = str;
-		while(lex.charAt(0) != '1') {
+		while(lex.charAt(0) != '5') {
 			lex = nextRotation(lex);
 		}
 		
