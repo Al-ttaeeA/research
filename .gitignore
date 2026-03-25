@@ -58,3 +58,6 @@ Thumbs.db
 *.tar
 *.tar.gz
 *.7z
+
+# Draw.io Backup files
+*.bkp
