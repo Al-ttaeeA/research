@@ -1,13 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99
-TARGET = aperiodic_coollex
+TARGETS = aperiodic_coollex aperiodic_bellringer
 
-all: $(TARGET)
+all: $(TARGETS)
 
-$(TARGET): aperiodic_coollex.c
-	$(CC) $(CFLAGS) -o $(TARGET) aperiodic_coollex.c
+aperiodic_coollex: aperiodic_coollex.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+aperiodic_bellringer: aperiodic_bellringer.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	del /Q $(TARGET).exe 2>nul
+	del /Q aperiodic_coollex.exe aperiodic_bellringer.exe 2>nul
 
 .PHONY: all clean
