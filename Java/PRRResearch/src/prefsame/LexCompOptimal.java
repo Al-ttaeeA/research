@@ -1,7 +1,5 @@
 package prefsame;
 
-import java.util.ArrayList;
-
 public class LexCompOptimal {
 	static class ParentReturn {
 		public String parent;
