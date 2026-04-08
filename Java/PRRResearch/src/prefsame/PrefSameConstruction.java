@@ -2,33 +2,35 @@ package prefsame;
 
 import java.util.ArrayList;
 
-class parentReturn {
-	public String child;
-	public String parentRunlength;
-	public int changeIndex;
-	
-	parentReturn(String child, String parentRunlength, int changeIndex){
-		this.child = child;
-		this.parentRunlength = parentRunlength;
-		this.changeIndex = changeIndex;
-	}
-	
-	public String toString() {
-		return "{" + child + " , " + parentRunlength + " , " + changeIndex + "}";
-	}
-}
-
-class conflictPair {
-	public int index;
-	public int digit;
-	
-	conflictPair(int index, int digit){
-		this.index = index;
-		this.digit = digit;
-	}
-}
-
 public class PrefSameConstruction {
+	
+	static class parentReturn {
+		public String child;
+		public String parentRunlength;
+		public int changeIndex;
+		
+		parentReturn(String child, String parentRunlength, int changeIndex){
+			this.child = child;
+			this.parentRunlength = parentRunlength;
+			this.changeIndex = changeIndex;
+		}
+		
+		public String toString() {
+			return "{" + child + " , " + parentRunlength + " , " + changeIndex + "}";
+		}
+	}
+	
+	static class conflictPair {
+		public int index;
+		public int digit;
+		
+		conflictPair(int index, int digit){
+			this.index = index;
+			this.digit = digit;
+		}
+	}
+	
+	
 	/*****************************************
 	 * Enter n value here to use the program *
 	 *****************************************/
