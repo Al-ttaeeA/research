@@ -142,12 +142,12 @@ public class LexCompOptimal {
 			
 			//inner loop runs n times
 			for(int index = changeIndex + traversal + section * n; index < Math.min(leastLength, ((section + 1) * n)); index++) {
-				System.out.println("Checking child of " + extString + " at index " + index + " of section " + section + " with changeIndex " + changeIndex + " and traversal " + traversal);	
+				//System.out.println("Checking child of " + extString + " at index " + index + " of section " + section + " with changeIndex " + changeIndex + " and traversal " + traversal);	
 				
 				//Check child at each index
 				ChildReturn childReturn = findChild(extString, index, CCR, runlength);
 				
-				System.out.println("Index " + index + " child return: " + childReturn);
+				//System.out.println("Index " + index + " child return: " + childReturn);
 				
 				if(childReturn != null) {
 					String child = childReturn.child;
@@ -208,8 +208,8 @@ public class LexCompOptimal {
 			return null;
 		}
 		
-		System.out.println("Found child at index " + index + " of section " + section + " with changeIndex " + index % n);
-		System.out.println("Parent runlength: " + runlength + ", i: " + i + ", curIndex: " + curIndex);
+		//System.out.println("Found child at index " + index + " of section " + section + " with changeIndex " + index % n);
+		//System.out.println("Parent runlength: " + runlength + ", i: " + i + ", curIndex: " + curIndex);
 		
 		String childRunlength = "";
 		childRunlength += runlength.substring(0, i-1);
@@ -228,7 +228,7 @@ public class LexCompOptimal {
 		String expectedParentRunlength = parentReturn.parentRunlength;
 		String expectedParent = parentReturn.parent;
 		
-		System.out.println("Expected parent runlength: " + expectedParentRunlength + ", expected parent: " + expectedParent);
+		//System.out.println("Expected parent runlength: " + expectedParentRunlength + ", expected parent: " + expectedParent);
 		
 		if(expectedParentRunlength.equals(runlength) && expectedParent.equals(subParent)) {
 			String child = constructStringFromRunlength(childRunlength, firstValue);
@@ -277,10 +277,10 @@ public class LexCompOptimal {
 				rotations = i;
 			}
 			
-			System.out.println("Rotation " + i + ": " + rotated + ", firstValue: " + curDigit + ", lexMaxRunlength: " + lexMaxRunlength);
+			//System.out.println("Rotation " + i + ": " + rotated + ", firstValue: " + curDigit + ", lexMaxRunlength: " + lexMaxRunlength);
 		}
 		
-		System.out.println("Lexicographically maximum runlength: " + lexMaxRunlength + ", rotations: " + rotations);
+		//System.out.println("Lexicographically maximum runlength: " + lexMaxRunlength + ", rotations: " + rotations);
 		
 		if(rotations % 2 == 1) {
 			firstValue = (char) ((charToInt(firstValue) + 1) % k + '0');
@@ -306,7 +306,7 @@ public class LexCompOptimal {
 		
 		String parent = constructStringFromRunlength(parentRunlength, charToInt(firstValue));
 		
-		System.out.println("Parent runlength: " + parentRunlength + ", parent: " + parent + ", firstValue: " + firstValue);
+		//System.out.println("Parent runlength: " + parentRunlength + ", parent: " + parent + ", firstValue: " + firstValue);
 		
 		return new ParentReturn(parent, parentRunlength);
 	}
