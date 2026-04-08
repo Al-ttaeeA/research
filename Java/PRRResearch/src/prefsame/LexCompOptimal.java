@@ -3,10 +3,52 @@ package prefsame;
 import java.util.ArrayList;
 
 public class LexCompOptimal {
+	class ParentReturn {
+		public String child;
+		public String parentRunlength;
+		public int changeIndex;
+		
+		ParentReturn(String child, String parentRunlength, int changeIndex){
+			this.child = child;
+			this.parentRunlength = parentRunlength;
+			this.changeIndex = changeIndex;
+		}
+		
+		public String toString() {
+			return "{" + child + " , " + parentRunlength + " , " + changeIndex + "}";
+		}
+	}
+	
+	class conflictPair {
+		public int index;
+		public int digit;
+		
+		conflictPair(int index, int digit){
+			this.index = index;
+			this.digit = digit;
+		}
+	}
+	
+	class ChildReturn {
+		public String child;
+		public String childRunlength;
+		
+		ChildReturn(String child, String childRunlength){
+			this.child = child;
+			this.childRunlength = childRunlength;
+		}
+		
+		public String toString() {
+			return "{" + child + " , " + childRunlength + "}";
+		}
+	}
+	
+	
+	
 	/*****************************************
 	 * Enter n value here to use the program *
 	 *****************************************/
-	public static int n = 7;
+	public static int n = 7; //This value is actually n-1 since the program is based on n-length strings, so the actual n value is n+1, but for ease of use we will just use n as the input value and treat it as n-1 in the program
 	
 	public static int k = 2;
 	
@@ -16,6 +58,7 @@ public class LexCompOptimal {
 
 	public static String actual = ""
 			+ "0101010111111110000000011111101111100111110100000010000011000001011110001111001000011100001101111011000010011110101110001000111011100110001100111001011101101110100111010100001010001101000100100010110001010110011011001010011001001101011011010010010110101010"
+			+ ""
 			+ "";
 	
 	public static String defaultString = "";
@@ -31,33 +74,28 @@ public class LexCompOptimal {
 	public static void function() {
 		total = (long) Math.pow(2, n);
 		
+		String defaultRunlength = "";
+		
 		for(int i = 0; i < n; i++) {
-			defaultString += "1";
+			defaultRunlength += "1";
 		}
 		
-		defaultString = extendCCR(defaultString);
+		defaultString = constructStringFromRunlength(defaultRunlength, 1);
 		
-		String start = "";
+		String start = defaultString;
 
 		if(n % 2 == 1) {
-			for(int i = 0; i < n; i++) {
-				start += "10";
-			}
-		}
-		else {
-			for(int i = 0; i < n/2; i++) {
-				start += "10";
-			}
+			start = extendCCR(start);
 		}
 		
 		int traversal = 0; //traversal type, 1 for left concatenation tree, 0 for right concatenation tree
 		int changeIndex = 0;
 		
 		if(n % 2 == 1) {
-			recursiveConcat(start, changeIndex, traversal, true);
+			recursiveConcat(start, changeIndex, traversal, true, defaultRunlength);
 		}
 		else {
-			recursiveConcat(start, changeIndex, traversal, false);
+			recursiveConcat(start, changeIndex, traversal, false, defaultRunlength);
 		}
 		
  		System.out.println(sequence);
@@ -78,7 +116,7 @@ public class LexCompOptimal {
 	 * @param traversal - concatenation tree type, 1 for left, 0 for right
 	 * @param CCR - 1 if the node is CCR based, 0 if PCR based
 	 ***************************************************/
-	public static void recursiveConcat(String extString, int changeIndex, int traversal, boolean CCR) {
+	public static void recursiveConcat(String extString, int changeIndex, int traversal, boolean CCR, String runlength) {
 		if(extString.equals(defaultString)) {
 			sequence += defaultString.substring(0, n);
 			sequence += "10";
@@ -86,6 +124,8 @@ public class LexCompOptimal {
 			sequence += " ";
 			return;
 		}
+		
+		boolean childFound = false;
 		
 		String least = leastPeriod(extString);
 		int leastLength = least.length();
@@ -97,13 +137,16 @@ public class LexCompOptimal {
 			//inner loop runs n times
 			for(int index = changeIndex + traversal + section * n; index < Math.min(leastLength, ((section + 1) * n)); index++) {
 				//Check child at each index
-				String child = findChild(extString, index, CCR);
+				ChildReturn childReturn = findChild(extString, index, CCR, runlength);
+				String child = childReturn.child;
+				String childRunlength = childReturn.childRunlength;
 				
 				if(child != null) {
-					recursiveConcat(child, index % n, traversal, !CCR);
+					childFound = true;
+					recursiveConcat(child, index % n, traversal, !CCR, childRunlength);
 				}
-				else if (index != changeIndex + section * n) {
-					break;
+				else if(childFound) {
+					break; //if we found a child before but not at this index, then we can stop checking for children in this section and concatenate the rest of the section	
 				}
 			}
 			
@@ -119,193 +162,25 @@ public class LexCompOptimal {
 	 * @param extString - extended parent string
 	 * @param index - index to find a child at
 	 * @param CCR - The CCR status of the parent
+	 * @param runlength - the runlength of the parent string
 	 * @return returns the child string OR null if no children were found
 	 **************************************************************/
-	public static String findChild(String extString, int index, boolean CCR) {
-		int section = index / n;
-		int sectionIndex = index % n;
+	public static ChildReturn findChild(String extString, int index, boolean CCR, String runlength) {
 		
-		String subParent = extString.substring(section * n, (section + 1) * n);
-		
-		int firstValue = charToInt(subParent.charAt(0));
-		
-		String parentRunlength = getRunlength(subParent);
-		
-		int curIndex = 0;
-		int i = 0;
-		
-		while(curIndex != sectionIndex) {
-			curIndex += charToInt(parentRunlength.charAt(i));
-			
-			if(curIndex > sectionIndex) {
-				return null;
-			}
-			
-			i++;
-		}
-		
-		String subChild;
-		String childRunlength = "";
-		
-		if(i == 0) {
-			subChild = constructStringFromRunlength(parentRunlength, modK(firstValue+1));
-			childRunlength = parentRunlength;
-		}
-		else {
-			childRunlength += parentRunlength.substring(0, i-1);
-			
-			int newRunlengthDigit = charToInt(parentRunlength.charAt(i-1)) + charToInt(parentRunlength.charAt(i));
-			
-			childRunlength += (char)(newRunlengthDigit + '0');
-			
-			childRunlength += parentRunlength.substring(i+1);
-			
-			subChild = constructStringFromRunlength(childRunlength, firstValue);
-		}
-		
-		parentReturn parentReturnValue = parent(subChild, CCR);
-		String expectedChild = parentReturnValue.child;
-		String expectedParentRunlength = parentReturnValue.parentRunlength;
-		int expectedChangeIndex = parentReturnValue.changeIndex;
-		
-		if(expectedChild.equals(subChild) && expectedParentRunlength.equals(parentRunlength) && expectedChangeIndex == (index % n)) {
-			if(!CCR) {
-				return extendCCR(subChild);
-			}
-			else {
-				return subChild;
-			}
-		}
-		
-		return null;
 	}
 	
 	/********************************************************
 	 * method to find the parent runlength of a child node
 	 * @param subChild - the child node
 	 * @param CCR - the CCR status of the parent
-	 * @return
+	 * @return 
 	 ********************************************************/
-	public static parentReturn parent(String subChild, boolean CCR) {
-		String rotated = subChild;
+	public static ParentReturn parent(String subChild, boolean CCR) {
 		
-		int rotations = 0;
-		//Get to the correct form for runlength
-		if(CCR) {
-			while(rotated.charAt(0) == rotated.charAt(n-1)) {
-				rotated = rotatePCR(rotated);
-				rotations++;
-			}
-		}
-		else {
-			while(rotated.charAt(0) != rotated.charAt(n-1)) {
-				rotated = rotateCCR(rotated);
-				rotations++;
-			}
-		}
-		
-		String runlength = getRunlength(rotated);
-		
-		if(!CCR) {
-			runlength += runlength;
-			rotated = extendCCR(rotated);
-		}
-		
-		int currentIndex = 0;
-		int largest = 0;
-		int largestIndex = 0;
-		int largestDigit = 0;
-		boolean conflict = false;
-		ArrayList<conflictPair> conflictIndices = new ArrayList<conflictPair>();
-		for(int i = 0; i < runlength.length(); i++) {
-			int curDigit = charToInt(runlength.charAt(i));
-			
-			if(curDigit > largest) {
-				largestIndex = i;
-				largest = curDigit;
-				largestDigit = charToInt(rotated.charAt(currentIndex));
-				conflictIndices.clear();
-				conflict = false;
-			}
-			else if(curDigit == largest) {
-				conflictIndices.add(new conflictPair(i, charToInt(rotated.charAt(currentIndex))));
-				conflict = true;
-			}
-			
-			currentIndex += curDigit;
-		}
-		
-		String parentRunlength = "";
-		
-		String childRunlength = runlength;
-		
-		if(!CCR) {
-			childRunlength = runlength.substring(0, runlength.length() / 2);
-		}
-		
-		int rotatedIndex = 0;
-		for(int i = 0; i < largestIndex; i++) {
-			childRunlength = rotatePCR(childRunlength);
-			rotatedIndex += charToInt(runlength.charAt(i));
-		}
-		
-		String child = constructStringFromRunlength(childRunlength, largestDigit);
-		
-		if(conflict) {
-			for(int i = 0; i < conflictIndices.size(); i++) {
-				conflictPair curPair = conflictIndices.get(i);
-				int curIndex = curPair.index;
-				int curDigit = curPair.digit;
-				
-				String cchildRunlength = childRunlength;
-				
-				for(int j = 0; j < curIndex - largestIndex; j++) {
-					cchildRunlength = rotatePCR(cchildRunlength);
-				}
-				
-				String cchild = constructStringFromRunlength(cchildRunlength, curDigit);
-				
-				//System.out.println(child + "   " + cchild);
-				
-				if(cchildRunlength.compareTo(childRunlength) > 0) {
-					childRunlength = cchildRunlength;
-					child = cchild;
-				}
-				else if(cchildRunlength.compareTo(childRunlength) == 0) {
-					if(cchild.compareTo(child) > 0) {
-						childRunlength = cchildRunlength;
-						child = cchild;
-					}
-				}
-			}
-		}
-		
-		int changeIndex;
-		for(changeIndex = childRunlength.length() - 1; changeIndex > 0; changeIndex--) {
-			if(childRunlength.charAt(changeIndex) != '1') break;
-		}
-		
-		int changeValue = charToInt(childRunlength.charAt(changeIndex));
-		
-		parentRunlength += childRunlength.substring(0, changeIndex);
-		parentRunlength += (char) (changeValue - 1 + '0');
-		parentRunlength += '1';
-		parentRunlength += childRunlength.substring(changeIndex+1);
-		
-		//Finding change index to compare later
-		int stringChangeIndex = -1;
-		for(int i = 0; i <= changeIndex; i++) {
-			stringChangeIndex += charToInt(childRunlength.charAt(i));
-		}
-		
-		int actualIndex = (stringChangeIndex + rotations + rotatedIndex) % n;
-		
-		for(int i = 0; i < (n - (rotations + rotatedIndex) % n); i++) {
-			child = rotatePCR(child);
-		}
-		
-		return new parentReturn(child, parentRunlength, actualIndex);
 	}
+	
+	
+	
 	
 	
 	/**********************************************************************************
