@@ -9,8 +9,8 @@ public class CCR3Construction {
 	/************************************************
 	 * Enter n and k values here to use the program *
 	 ************************************************/
-	public static int n = 6;
-	public static int k = 2;
+	public static int n = 3;
+	public static int k = 4;
 	
 	public static long total;
 	
