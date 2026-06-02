@@ -9,6 +9,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+class Entry {
+    int length;
+    String sequenceBetween;
+    int balance0;
+    int balance1;
+
+    Entry(int length, String sequenceBetween, int balance0, int balance1) {
+        this.length = length;
+        this.sequenceBetween = sequenceBetween;
+        this.balance0 = balance0;
+        this.balance1 = balance1;
+    }
+}
+
 public class CycleLength {
     public static int n = 8;
     public static int k = 2;
@@ -28,17 +42,17 @@ public class CycleLength {
     public static String[] LC2 = {"0101001111011000", "01010110100100011001111101110000", "0101010010111010110100010011011001000011000111111011110011100000", "01010101101010010100010110010111101011101001101000010010011101101100010001101110010000011001100001110001111111011111001111000000", "0101010100101011101010110101000101001101011001010000101101101001001011000101110010111110101111010011101000110100000100100010011001001111011011101100110110000100011101110001000011011110010000001100111001100011000001110000111111110111111001111100011110000000", "01010101011010101001010100010101100101011110101011101010011010100001010010010100111010110110101100010100011010111001010000010110100101101110100100010110011010011001011000010111011010001001011100010111100101111110101111101001111010001110100001101000000100100110110110010010000100110001001110010011111011011110110011101100011011000001000100011001000111101110111001101110000100001110111100010000011011111001000000011001100111100110000110001110011100011000000111000001111000011111111101111111001111110001111100000000", "0101010101001010101110101010110101010001010100110101011001010100001010110110101001001010110001010111001010111110101011110101001110101000110101000001010010110101101001010010001010011001010011110101101110101100110101100001010001001010001110101110110101110001010000110101111001010000001011010001011011001011011110100101110100100110100100001011001001011001110100110110100110001011000110100111001011000001011101110100010001011100110100011001011100001011110110100001001011110001011111001011111110101111110100111110100011110100001110100000110100000001001001001110110110110001001000110110111001001000001001101110110010001001100110110011001001100001001110001001111001001111110110111110110011110110001110110000110110000001000100001000110001000111001000111110111011110111001110111000110111000001000011001000011110111100110111100001000001110111110001000000110111111001000000001100110001100111110011001110011000001100011110011100001100001110011110001100000001110001110000001111000001111111111011111111001111111000111111000011111000000000"};
     public static String[] RunLength2 = {"0101111001000011", "01010010111110011000100000111011", "0101011111100011000010000001110011011001001111011101001010001011", "01010100101011111110001101101110010010001110000110000010000000111100110011101100101100010011010011111011110100010100001011101011", "0101010111111110000110111011011010010010110111100100010010000111000001100000010000000011110001110111001011100010001101000111110011100110010011000110011011001111011000101100001001110100110101100101001111110111110100001010000010111101011101010010101000101011", "01010101001010101111111110000111011101101001011010001001011101111001011110001000100001101000011110000011011110110111010010010100100010110110101101111100100001001000001110000001100000001000000000111110001110011011100111001001101101100100100111000110010001100011011000111101110001011100001000111010001101011100101000111111001111001100110001001100001100111011001101001100101100111110110000101100000100111101001110101100101011000101001101010011111110111111010000010100000010111110101111010100010101000010101110101011", "0101010101111111111000001110111101101000101101000010010111010010110101101001010010111101110111010001001010001000101110110101110111110010111110001000010001000001101000001111000000110111110110111101001000101001000010110111010110110101001001010110111111001000001001000000111000000011000000001000000000011111000011100111011100110100011001011100111100100111011011001011011000100100110100100111100011000100011000011011000011110111100010111100001000011101000011010111100101000011111100011100100011011011011100100100100011100011011100011110011011101100100101100100010011011010011011110011100010011100001100100001100011101100011010011100101100011111011100001011100000100011110100011101011100101011100010100011010100011111110011111001100011001100001001100000110011100110011011001100100110011110110011101001100101001100010110011010110011111101100000101100000010011111010011110101100010101100001010011101010011010101100101010011111111011111110100000010100000001011111101011111010100001010100000101011110101011101010100101010100010101011"};
     
-    public static HashMap<String, Integer> cycleLengths = new HashMap<>();
+    public static HashMap<String, Entry> cycleLengths = new HashMap<>();
 
     public static void main(String[] args) {
         String[] names = {"CCR1", "CCR2", "CCR3", "CCR4", "PrefSame", "LexComp", "RunLength", "PrefOpp", "LC2", "RunLength2"};
         String[][] algorithms = {CCR1, CCR2, CCR3, CCR4, PrefSame, LexComp, RunLength, PrefOpp, LC2, RunLength2};
 
         // allResults: algorithm name -> list of cycle-length maps, index 0 = n=4 ... index 4 = n=8
-        HashMap<String, List<HashMap<String, Integer>>> allResults = new HashMap<>();
+        HashMap<String, List<HashMap<String, Entry>>> allResults = new HashMap<>();
 
         for (int a = 0; a < algorithms.length; a++) {
-            List<HashMap<String, Integer>> resultsByN = new ArrayList<>();
+            List<HashMap<String, Entry>> resultsByN = new ArrayList<>();
             for (int i = 0; i < algorithms[a].length; i++) {
                 n = i + 4;
                 sequence = algorithms[a][i];
@@ -54,13 +68,13 @@ public class CycleLength {
         json.append("{\n");
         for (int a = 0; a < names.length; a++) {
             json.append("  \"").append(names[a]).append("\": {\n");
-            List<HashMap<String, Integer>> resultsByN = allResults.get(names[a]);
+            List<HashMap<String, Entry>> resultsByN = allResults.get(names[a]);
             for (int i = 0; i < resultsByN.size(); i++) {
                 int nVal = i + 4;
                 cycleLengths = resultsByN.get(i);
                 n = nVal;
-                LinkedHashMap<String, Integer> byKey = sortByKey();
-                LinkedHashMap<String, Integer> byCycle = sortByCycleLength();
+                LinkedHashMap<String, Entry> byKey = sortByKey();
+                LinkedHashMap<String, Entry> byCycle = sortByCycleLength();
 
                 json.append("    \"n=").append(nVal).append("\": {\n");
 
@@ -90,10 +104,13 @@ public class CycleLength {
         }
     }
 
-    public static void appendEntries(StringBuilder sb, LinkedHashMap<String, Integer> map) {
-        List<Map.Entry<String, Integer>> entries = new ArrayList<>(map.entrySet());
+    public static void appendEntries(StringBuilder sb, LinkedHashMap<String, Entry> map) {
+        List<Map.Entry<String, Entry>> entries = new ArrayList<>(map.entrySet());
         for (int i = 0; i < entries.size(); i++) {
-            sb.append("        \"").append(entries.get(i).getKey()).append("\": ").append(entries.get(i).getValue());
+            Entry e = entries.get(i).getValue();
+            sb.append("        \"").append(entries.get(i).getKey()).append("\": \"")
+              .append(e.length).append(", Sequence: ").append(e.sequenceBetween)
+              .append(", Balance: ").append(e.balance0).append("/").append(e.balance1).append("\"");
             if (i < entries.size() - 1) sb.append(",");
             sb.append("\n");
         }
@@ -102,35 +119,35 @@ public class CycleLength {
     public static void fixCycleLengths() {
         int maxDiff = (int) Math.pow(k, n - 1);
         int seqLength = (int) Math.pow(k, n);
-        for (Map.Entry<String, Integer> entry : cycleLengths.entrySet()) {
-            if (entry.getValue() > maxDiff) {
-                cycleLengths.put(entry.getKey(), seqLength - entry.getValue());
+        for (Map.Entry<String, Entry> entry : cycleLengths.entrySet()) {
+            if (entry.getValue().length > maxDiff) {
+                cycleLengths.put(entry.getKey(), new Entry(seqLength - entry.getValue().length, entry.getValue().sequenceBetween, entry.getValue().balance0, entry.getValue().balance1));
             }
         }
     }
 
-    public static LinkedHashMap<String, Integer> sortByKey() {
+    public static LinkedHashMap<String, Entry> sortByKey() {
         List<String> keys = new ArrayList<>(cycleLengths.keySet());
         Collections.sort(keys);
-        LinkedHashMap<String, Integer> sorted = new LinkedHashMap<>();
+        LinkedHashMap<String, Entry> sorted = new LinkedHashMap<>();
         for (String key : keys) {
             sorted.put(key, cycleLengths.get(key));
         }
         return sorted;
     }
 
-    public static LinkedHashMap<String, Integer> sortByCycleLength() {
-        List<Map.Entry<String, Integer>> entries = new ArrayList<>(cycleLengths.entrySet());
-        entries.sort((a, b) -> b.getValue() - a.getValue());
-        LinkedHashMap<String, Integer> sorted = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> entry : entries) {
+    public static LinkedHashMap<String, Entry> sortByCycleLength() {
+        List<Map.Entry<String, Entry>> entries = new ArrayList<>(cycleLengths.entrySet());
+        entries.sort((a, b) -> b.getValue().length - a.getValue().length);
+        LinkedHashMap<String, Entry> sorted = new LinkedHashMap<>();
+        for (Map.Entry<String, Entry> entry : entries) {
             sorted.put(entry.getKey(), entry.getValue());
         }
         return sorted;
     }
 
     public static void function(){
-    	sequence = sequence + sequence.substring(0, n-1);
+    	sequence = sequence + sequence;
     	
         int total = (int) Math.pow(k, n-1);
 
@@ -139,7 +156,13 @@ public class CycleLength {
         int count = 0;
         int i = 0;
 
+        String sequenceBetween = "";
+        int balance0 = 0;
+        int balance1 = 0;
+
         while (count < total) {
+            boolean found = false;
+
             String current = sequence.substring(i, i+newN);
 
             if(cycleLengths.containsKey(current)){
@@ -147,14 +170,42 @@ public class CycleLength {
                 continue;
             }
 
+            sequenceBetween += sequence.charAt(i);
+            if(sequence.charAt(i) == '0'){
+                balance0++;
+            } else {
+                balance1++;
+            }
+
             for(int j = i+1; j < sequence.length(); j++){
-                if(sequence.substring(j, j+newN).equals(current)){
-                    cycleLengths.put(current, j-i);
+                if(j-i > Math.pow(k, n-1)){ //If the cycle length is greater than half of the sequence, then it wraps around to get a shorter cycle, therefore we skip it
+                    sequenceBetween = "";
+                    balance0 = 0;
+                    balance1 = 0;
                     break;
+                }
+
+                if(sequence.substring(j, j+newN).equals(current)){
+                    cycleLengths.put(current, new Entry(j-i, sequenceBetween, balance0, balance1));
+                    sequenceBetween = "";
+                    balance0 = 0;
+                    balance1 = 0;
+                    found = true;
+                    break;
+                }
+
+                sequenceBetween += sequence.charAt(j);
+
+                if(sequence.charAt(j) == '0'){
+                    balance0++;
+                } else {
+                    balance1++;
                 }
             }
             i++;
-            count++;
+            if(found){
+                count++;
+            }
 
             if(i + newN > sequence.length()){
 				break;
