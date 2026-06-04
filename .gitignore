@@ -61,3 +61,6 @@ Thumbs.db
 
 # Draw.io Backup files
 *.bkp
+
+# JSON files
+*.json
