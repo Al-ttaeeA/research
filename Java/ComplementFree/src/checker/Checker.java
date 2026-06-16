@@ -1,66 +1,80 @@
 package checker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Checker {
-    public static String sequence = "00010020030110120130210220311112";
-
-    public static int length = sequence.length();
+    public static String sequence = "02303203311312212313213322232333";
 
     public static int n = 3;
     public static int k = 4;
 
     public static void main(String[] args) {
-        sequence = sequence + sequence.substring(0, n-1); // append first n-1 chars to end for wraparound
+        check(sequence, k, n);
+    }
 
-        ArrayList<String> strings = new ArrayList<>(); 
+    public static void check(String sequence, int k, int n) {
+        int len = sequence.length();
+        String extended = sequence + sequence.substring(0, n - 1); // append first n-1 chars to end for wraparound
 
-        for(int i = 0; i < length; i++) {
-            String s = sequence.substring(i, i+n);
+        int total = (int) Math.pow(k, n);
+        int[] seen = new int[total]; // seen[idx] = position where string was first seen, or -1
+        Arrays.fill(seen, -1);
 
-            if(strings.contains(s)) {
-                System.out.println("Duplicate string: " + s + " at positions " + i + " and " + strings.indexOf(s));
-                System.out.println(strings);
+        for (int i = 0; i < len; i++) {
+            String s = extended.substring(i, i + n);
+            int idx = stringToIndex(s, k);
+            int compIdx = total - 1 - idx; // complement index: each digit d -> k-1-d flips idx to (total-1-idx)
+
+            if (seen[idx] != -1) {
+                System.out.println("Duplicate string: " + s + " at positions " + i + " and " + seen[idx]);
                 return;
             }
-            
-            if(strings.contains(complementString(s))) {
-                System.out.println("Not complement-free: " + s + " and " + complementString(s) + " at positions " + i + " and " + strings.indexOf(complementString(s)));
-                System.out.println(strings);
+
+            if (seen[compIdx] != -1) {
+                System.out.println("Not complement-free: " + s + " and " + complementString(s, k) + " at positions " + i + " and " + seen[compIdx]);
                 return;
             }
-            strings.add(s);
+
+            seen[idx] = i;
         }
 
         System.out.println("Sequence is complement-free.");
 
         // Check all possible single-digit insertions
-        System.out.println("\nChecking all possible single-digit insertions...");
-        String originalSeq = sequence.substring(0, length);
-        boolean foundInsertion = false;
-        for (int pos = 0; pos <= length; pos++) {
-            for (int digit = 0; digit < k; digit++) {
-                String newSeq = originalSeq.substring(0, pos) + digit + originalSeq.substring(pos);
-                if (checkComplementFree(newSeq, length + 1)) {
-                    System.out.println("Valid insertion: digit " + digit + " at position " + pos + " -> " + newSeq);
-                    foundInsertion = true;
-                }
-            }
-        }
-        if (!foundInsertion) {
-            System.out.println("No valid single-digit insertion found.");
-        }
+        // System.out.println("\nChecking all possible single-digit insertions...");
+        // boolean foundInsertion = false;
+        // for (int pos = 0; pos <= len; pos++) {
+        //     for (int digit = 0; digit < k; digit++) {
+        //         String newSeq = sequence.substring(0, pos) + digit + sequence.substring(pos);
+        //         if (checkComplementFree(newSeq, len + 1, n, k)) {
+        //             System.out.println("Valid insertion: digit " + digit + " at position " + pos + " -> " + newSeq);
+        //             foundInsertion = true;
+        //         }
+        //     }
+        // }
+        // if (!foundInsertion) {
+        //     System.out.println("No valid single-digit insertion found.");
+        // }
     }
 
-    public static String complementString(String s) {
+    public static int stringToIndex(String s, int k) {
+        int idx = 0;
+        for (char c : s.toCharArray()) {
+            idx = idx * k + charToInt(c);
+        }
+        return idx;
+    }
+
+    public static String complementString(String s, int k) {
         StringBuilder sb = new StringBuilder();
         for (char c : s.toCharArray()) {
-            sb.append(complement(c));
+            sb.append(complement(c, k));
         }
         return sb.toString();
     }
 
-    public static char complement(char c) {
+    public static char complement(char c, int k) {
         int val = charToInt(c);
         int compVal = k - 1 - val; // complement in Z_k
         return (char) (compVal + '0'); // convert back to char
@@ -70,12 +84,12 @@ public class Checker {
         return Character.getNumericValue(c);
     }
 
-    public static boolean checkComplementFree(String seq, int len) {
+    public static boolean checkComplementFree(String seq, int len, int n, int k) {
         String extended = seq + seq.substring(0, n - 1);
         ArrayList<String> strings = new ArrayList<>();
         for (int i = 0; i < len; i++) {
             String s = extended.substring(i, i + n);
-            if (strings.contains(s) || strings.contains(complementString(s))) {
+            if (strings.contains(s) || strings.contains(complementString(s, k))) {
                 return false;
             }
             strings.add(s);
@@ -83,12 +97,11 @@ public class Checker {
         return true;
     }
 
-    public static int modK(int num) {
-		int value = num % k;
-		if(value < 0) {
-			value = value + k;
-		}
-		
-		return value;
-	}
+    public static int modK(int num, int k) {
+        int value = num % k;
+        if (value < 0) {
+            value = value + k;
+        }
+        return value;
+    }
 }
