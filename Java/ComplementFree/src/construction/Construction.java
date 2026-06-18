@@ -109,11 +109,335 @@ public class Construction {
         return null;
     }
 
-    public static String oddEven(int k, int n) {
-        return null;
+    // ==========================================================================================
+    // NAS-BASED HELPERS  (mirrors NAS.c by Joe Sawada, 2026)
+    //
+    // Mathematical basis
+    // ------------------
+    // For odd k:
+    //   negative of digit a  = (-a) mod k  = (k - a) mod k
+    //   complement of digit a = k - 1 - a
+    //
+    // Let s = (k-1)/2.  Then 2s = k-1 ≡ -1 (mod k).
+    // Shifting digit a by s gives (a+s) mod k, and:
+    //   negative((a+s) mod k) = (k - a - s) mod k
+    //   complement(a)         = k - 1 - a
+    // These coincide (mod k) because k - 1 - a = k - a - 1 = k - a - (2s) mod k when
+    // we treat them symmetrically.  Concretely: applying the shift s to every symbol of
+    // a negative-free (NAS) sequence yields a complement-free sequence.
+    //
+    // Implementation
+    // --------------
+    // The helpers below are a line-for-line Java translation of NAS.c.  They build the
+    // antinegative Eulerian subgraph Wk(n-1) (Construction 5.1, odd n) or Zk(n)
+    // (Theorem 7.2, even n) from the paper "Negative Avoiding Sequences" by Mitchell &
+    // Wild (2026), then collect the resulting NAS into a StringBuilder.  After generation
+    // applyComplementShift converts the NAS into a complement-free sequence.
+    // ==========================================================================================
+
+    // --- Static state (mirrors global variables in NAS.c) ---
+
+    /** Current necklace tuple being built by nasFkm (1-indexed). Mirrors a[] in NAS.c. */
+    private static int[] a_nas = new int[100];
+
+    /** Running prefix sum for the Lempel D^-1 homomorphism. Mirrors lempel in NAS.c. */
+    private static int lempel_nas;
+
+    /** Which of the k Lempel-lift iterations we are currently in. Mirrors ITERATION. */
+    private static int ITERATION_nas;
+
+    /**
+     * Period of the special constant-(k-1) cycle that must be punctured once per
+     * ITERS_TIL_PUNCTURE iterations so the k pre-image circuits fuse into one Eulerian
+     * circuit.  Mirrors ITERS_TIL_PUNCTURE in NAS.c.
+     */
+    private static int ITERS_TIL_PUNCTURE_nas;
+
+    /**
+     * Working span used inside nasFkm.
+     * Equals n_orig_nas for odd n_orig; equals n_orig_nas - 1 for even n_orig (the
+     * underlying odd-order NAS used by the Lempel lift).
+     */
+    private static int n_nas;
+
+    /** Original span as passed to oddOdd / oddEven. */
+    private static int n_orig_nas;
+
+    /** Alphabet size. */
+    private static int k_nas;
+
+    /** Accumulated output symbols (replaces printf / PrintSym in NAS.c). */
+    private static StringBuilder nas_output;
+
+    // --- Low-level output ---
+
+    /**
+     * Append one symbol x to nas_output.
+     * Values 0-9 use characters '0'-'9'; values 10+ use 'A'-'Z'.
+     * Mirrors PrintSym in NAS.c.
+     */
+    private static void nasPrintSym(int x) {
+        if (x < 10) nas_output.append((char) ('0' + x));
+        else        nas_output.append((char) ('A' + (x - 10)));
     }
 
+    // --- Arithmetic helper ---
+
+    /** Recursive Euclidean GCD. Mirrors GCD in NAS.c. */
+    private static int nasGcd(int a, int b) {
+        return b == 0 ? a : nasGcd(b, a % b);
+    }
+
+    // --- Necklace / negation helpers ---
+
+    /**
+     * Compute the lexicographically smallest rotation (necklace representative) of
+     * b[1..n_nas] and store it in neck[1..n_nas].  neck must have size >= 2*n_nas+1.
+     * Uses the same doubling-plus-scan algorithm as GetNecklace in NAS.c.
+     */
+    private static void nasGetNecklace(int[] b, int[] neck) {
+        int n = n_nas;
+        // Double the array so every rotation appears as a contiguous sub-array
+        for (int j = 1; j <= n; j++) neck[j] = neck[n + j] = b[j];
+        int j = 1, t = 1, p = 1;
+        do {
+            t = t + p * ((j - t) / p);
+            j = t + 1;
+            p = 1;
+            while (j <= 2 * n && neck[j - p] <= neck[j]) {
+                if (neck[j - p] < neck[j]) p = j - t + 1;
+                j++;
+            }
+        } while (p * ((j - t) / p) < n);
+        // Copy the canonical rotation to the front of neck[]
+        for (j = 1; j <= n; j++) neck[j] = neck[j + t - 1];
+    }
+
+    /**
+     * Return true iff a_nas[1..n_nas] is lexicographically smaller than the necklace
+     * representative of its component-wise negative (k - a_i) mod k.
+     *
+     * This selects exactly one member from each {necklace, negative-necklace} pair —
+     * implementing Construction 5.1 (Lemma 5.5) of the paper.
+     * Mirrors SmallerThanNeg in NAS.c.
+     */
+    private static boolean nasSmallerThanNeg() {
+        int n = n_nas, k = k_nas;
+        int[] b    = new int[100];
+        int[] neck = new int[200];
+        for (int i = 1; i <= n; i++) b[i] = (k - a_nas[i]) % k;  // compute negative
+        nasGetNecklace(b, neck);                                    // canonicalise
+        for (int i = 1; i <= n; i++) {
+            if (a_nas[i] < neck[i]) return true;
+            if (a_nas[i] > neck[i]) return false;
+        }
+        return false;  // equal => self-negative; do not include
+    }
+
+    // --- Output / Lempel-lift helper ---
+
+    /**
+     * Output the Lyndon prefix of the current necklace (odd n_orig_nas), or apply the
+     * Lempel D^-1 homomorphism to it (even n_orig_nas).
+     *
+     * Odd n_orig path  : append a_nas[1..p] directly (they form the Lyndon word).
+     *
+     * Even n_orig path : maintain the running prefix sum  lempel_nas = sum(a[i]) mod k
+     *                    and append those values.  Also handles the puncture of the
+     *                    constant-(k-1) necklace: one occurrence per
+     *                    ITERS_TIL_PUNCTURE_nas iterations is suppressed so that the k
+     *                    pre-image circuits fuse into a single Eulerian circuit
+     *                    (Theorem 7.2 of the paper).
+     *
+     * Mirrors Print(p) in NAS.c.
+     */
+    private static void nasPrint(int p) {
+        if (n_orig_nas % 2 == 0) {
+            // ---- Even n_orig: Lempel D^-1 lift ----
+            for (int i = 1; i <= p; i++) {
+                // The constant-(k-1) necklace has Lyndon word of length 1, value k-1.
+                // Detect it and apply the puncture logic.
+                if (p == 1 && a_nas[i] == k_nas - 1) {
+                    if (ITERATION_nas == 1) {
+                        // First encounter in the first iteration: compute puncture period.
+                        // next_symbol is what lempel_nas would become after absorbing this
+                        // symbol (computed before the prefix-sum update below).
+                        int next_symbol = (lempel_nas + a_nas[i]) % k_nas;
+                        ITERS_TIL_PUNCTURE_nas = k_nas / nasGcd(k_nas, next_symbol);
+                    }
+                    // Skip (puncture) on every ITERS_TIL_PUNCTURE_nas-th iteration
+                    if (ITERATION_nas % ITERS_TIL_PUNCTURE_nas == 0) return;
+                }
+                // D^-1: the output symbol is the running prefix sum
+                lempel_nas = (lempel_nas + a_nas[i]) % k_nas;
+                nasPrintSym(lempel_nas);
+            }
+        } else {
+            // ---- Odd n_orig: print Lyndon prefix directly ----
+            for (int i = 1; i <= p; i++) nasPrintSym(a_nas[i]);
+        }
+    }
+
+    // --- Core FKM generator ---
+
+    /**
+     * Recursive FKM necklace generator restricted to k-ary n_nas-tuples that satisfy the
+     * pseudoweight condition for negative-free sequences (Definitions 5.2, Construction 5.1).
+     *
+     * w tracks TWICE the pseudoweight of a_nas[1..t-1] (kept integer):
+     *   symbol 0 contributes k   (f(0) = k/2, doubled = k)
+     *   symbol j > 0 contributes 2*j
+     *
+     * A necklace at a leaf is emitted iff:
+     *   w > k*n_nas  (pseudoweight strictly above kn/2 — entire Ek(n) set), OR
+     *   w == k*n_nas AND nasSmallerThanNeg()  (exactly kn/2 — selects one from each
+     *                                          conjugate pair, per Lemma 5.5).
+     *
+     * Mirrors FKM(t, p, w) in NAS.c.
+     */
+    private static void nasFkm(int t, int p, int w) {
+        int n = n_nas, k = k_nas;
+        // Pruning: even assigning max contribution 2*(k-1) to every remaining position
+        // cannot reach the required doubled pseudoweight k*n -> dead end.
+        if ((n - t + 1) * 2 * (k - 1) + w < k * n) return;
+        if (t > n) {
+            // Leaf: emit Lyndon prefix iff this is a valid necklace period AND the
+            // pseudoweight condition passes.
+            if (n % p == 0 && (w > k * n || nasSmallerThanNeg())) nasPrint(p);
+            return;
+        }
+        // Enumerate symbols j >= a_nas[t-p] (maintains the necklace lex-order invariant)
+        for (int j = a_nas[t - p]; j < k; j++) {
+            a_nas[t] = j;
+            int x = (j == 0) ? k : 2 * j;          // contribution to doubled pseudoweight
+            if (j == a_nas[t - p]) nasFkm(t + 1, p, w + x);  // period candidate unchanged
+            else                   nasFkm(t + 1, t, w + x);   // new period candidate = t
+        }
+    }
+
+    // --- Alphabet shift: negative-free -> complement-free ---
+
+    /**
+     * Apply alphabet shift s = (k-1)/2 to every symbol in seq.
+     *
+     * For odd k, 2s = k-1 ≡ -1 (mod k), so the shift maps the "negative" relation
+     * a <-> -a to the "complement" relation a <-> k-1-a.  Consequently, any
+     * negative-free (NAS) sequence becomes complement-free after this shift.
+     */
+    private static String applyComplementShift(String seq, int k) {
+        int shift = (k - 1) / 2;
+        StringBuilder sb = new StringBuilder(seq.length());
+        for (int ci = 0; ci < seq.length(); ci++) {
+            char c = seq.charAt(ci);
+            int sym = (c >= '0' && c <= '9') ? (c - '0') : (c - 'A' + 10);
+            int shifted = (sym + shift) % k;
+            if (shifted < 10) sb.append((char) ('0' + shifted));
+            else              sb.append((char) ('A' + (shifted - 10)));
+        }
+        return sb.toString();
+    }
+
+    // ==========================================================================================
+    // Public construction methods
+    // ==========================================================================================
+
+    /**
+     * Construct a maximal complement-free sequence for odd k, odd n.
+     *
+     * Mirrors the ODD CASE of NAS.c main():
+     *   1. nasFkm generates the Fk(n) edge set (Construction 5.1) — a maximal NASk(n).
+     *   2. applyComplementShift converts the NAS to complement-free by shifting each
+     *      symbol by (k-1)/2.
+     */
     public static String oddOdd(int k, int n) {
-        return null;
+        // Initialise all static state before the run
+        nas_output = new StringBuilder();
+        n_nas      = n;
+        n_orig_nas = n;
+        k_nas      = k;
+        a_nas[0]   = 0;
+
+        nasFkm(1, 1, 0);  // Generate the maximal NASk(n) via pseudoweight-filtered FKM
+
+        // Shift each symbol by (k-1)/2 to convert negative-free -> complement-free
+        return applyComplementShift(nas_output.toString(), k);
+    }
+
+    /**
+     * Construct a maximal complement-free sequence for odd k, even n.
+     *
+     * Two sub-cases (mirrors NAS.c main()):
+     *
+     * n == 2 : Direct construction of Y_k (Definition 6.1 / Theorem 6.2).
+     *          For each starting vertex j = 0..k-1, outputs:
+     *            - The vertex j itself (step-1 main cycle).
+     *            - An extra j for the diagonal edge (j,j) when 0 < j <= (k-1)/2.
+     *            - For each step i = 2..(k-1)/2: if j is the canonical seed of the
+     *              i-step cycle (j < gcd(i,k)), the full cycle of length k/gcd(i,k).
+     *
+     * n >= 4 : Lempel D^-1 lift (Theorem 7.2).
+     *          nasFkm is run k times (each time with the Lempel prefix sum continuing
+     *          from the previous iteration) to generate the D^-1 lift of the order-(n-1)
+     *          NAS.  For odd k, the extra self-negative circuit b_x (which has exactly
+     *          one edge and therefore contributes one output symbol) is inserted before
+     *          each FKM pass when lempel_nas is in (0, (k-1)/2].  One copy of the
+     *          constant-(k-1) necklace is punctured every ITERS_TIL_PUNCTURE_nas
+     *          iterations; the missing tail is appended afterwards to close the circuit.
+     *
+     * The result is shifted by (k-1)/2 to produce the complement-free output.
+     */
+    public static String oddEven(int k, int n) {
+        // Initialise all static state before the run
+        nas_output = new StringBuilder();
+        k_nas      = k;
+        n_orig_nas = n;
+
+        if (n == 2) {
+            // ---- Special case: n = 2, odd k ----------------------------------------
+            // Mirrors the k-odd sub-block of the n==2 special case in NAS.c main().
+            // Iterates over starting vertices j = 0..k-1 and joins cycles by step size.
+            for (int j = 0; j < k; j++) {
+                nasPrintSym(j);  // step-1 main cycle: outputs vertex j
+
+                // Diagonal edge (j, j) is in Y_k for j = 1,...,(k-1)/2
+                if (j > 0 && j <= k / 2) nasPrintSym(j);
+
+                // Cycles of step i, for i = 2,...,(k-1)/2
+                for (int i = 2; i <= k / 2; i++) {
+                    int g = nasGcd(i, k);
+                    // Only the canonical seed j < gcd(i,k) outputs this cycle
+                    if (j < g) {
+                        for (int t = 1; t <= k / g; t++) nasPrintSym((j + i * t) % k);
+                    }
+                }
+            }
+        } else {
+            // ---- Even n > 2, odd k --------------------------------------------------
+            // Mirrors the EVEN CASE (n_orig % 2 == 0 && n_orig > 2) of NAS.c main().
+            // The underlying NAS has odd order n-1; nasFkm uses n_nas = n-1, while
+            // nasPrint applies the Lempel D^-1 lift because n_orig_nas is even.
+            n_nas    = n - 1;
+            a_nas[0] = lempel_nas = 0;
+
+            for (ITERATION_nas = 1; ITERATION_nas <= k; ITERATION_nas++) {
+                // For odd k, when lempel_nas is in (0, (k-1)/2] the pre-image of the
+                // self-negative loop [0,0,...,0] in Tk(n-2) under D^-1 is the single-
+                // edge circuit b_x = [x,x,...,x] at vertex (x,...,x) in Bk(n-1),
+                // which contributes exactly 1 output symbol (Theorem 7.2, odd-k case).
+                if (lempel_nas > 0 && lempel_nas <= (k - 1) / 2) {
+                    nasPrintSym(lempel_nas);
+                }
+
+                // Generate the order-(n-1) NAS; nasPrint applies D^-1 to lift to order n
+                nasFkm(1, 1, 0);
+            }
+
+            // Append the tail of the punctured cycle to close the Eulerian circuit.
+            // The tail descends from (k / ITERS_TIL_PUNCTURE_nas - 1) down to 0.
+            for (int i = k / ITERS_TIL_PUNCTURE_nas - 1; i >= 0; i--) nasPrintSym(i);
+        }
+
+        // Shift each symbol by (k-1)/2 to convert negative-free -> complement-free
+        return applyComplementShift(nas_output.toString(), k);
     }
 }
