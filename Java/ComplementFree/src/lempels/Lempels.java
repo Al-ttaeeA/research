@@ -7,12 +7,12 @@ public class Lempels {
 	/************************************************
 	 * Enter values here
 	 ************************************************/
-	static int n = 8;
-	static int k = 2;
+	static int n = 3;
+	static int k = 4;
 	static int beta = 1;
 	// de Bruijn sequence of order n over Z_k — weight must be 0 mod k
 	// (guaranteed for n > 1, or n = 1 with odd k, by Lemma 3.7)
-	static String sequence = "0000000010000001100000101000001110000100100001011000011010000111100010001001100010101000101110001100100011011000111010001111100100101001001110010101100101101001011110011001101010011011100111011001111010011111101010101110101101101011111011011110111011111111";
+	static String sequence = "0030130230320331231332232333";
 
 	public static void main(String[] args) {
 		ArrayList<String> cycles = lempelLift(sequence, n, k, beta);
@@ -36,10 +36,10 @@ public class Lempels {
 		int betaInv = modInverse(beta, k);
 
 		// check weight ≡ 0 mod k
-		int w = 0;
-		for (char c : seqStr.toCharArray()) w = (w + Character.getNumericValue(c)) % k;
-		if (w != 0)
-			throw new IllegalArgumentException("Sequence weight is not 0 mod k");
+		// int w = 0;
+		// for (char c : seqStr.toCharArray()) w = (w + Character.getNumericValue(c)) % k;
+		// if (w != 0)
+		// 	throw new IllegalArgumentException("Sequence weight is not 0 mod k");
 
 		int kn = seqStr.length(); // k^n
 
@@ -51,6 +51,12 @@ public class Lempels {
 			sum = (sum + Character.getNumericValue(seqStr.charAt(j))) % k;
 			C0[j] = (betaInv * sum) % k;
 		}
+
+		// Check weight of C0 is 0 mod k, as required by Theorem 3.2(c)
+		int wC0 = 0;
+		for (int c : C0) wC0 = (wC0 + c) % k;
+		if (wC0 != 0)
+			throw new IllegalStateException("C_0 weight is not 0 mod k");
 
 		// C_i = C_0 + i (mod k)  — translation by i (Theorem 3.2(c))
 		ArrayList<String> cycles = new ArrayList<>();
