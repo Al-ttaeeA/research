@@ -70,9 +70,9 @@ def lempel_lift(seq, k, beta=1):
 
     # Theorem 3.2(c): weight of C_0 must be 0 mod k
     if sum(C0) % k != 0:
-        raise ValueError(
-            f"weight(C_0) ≡ {sum(C0) % k} (mod {k}), expected 0"
-        )
+         raise ValueError(
+             f"weight(C_0) ≡ {sum(C0) % k} (mod {k}), expected 0"
+         )
 
     # Produce the k translated copies
     return [''.join(str((x + i) % k) for x in C0) for i in range(k)]
