@@ -10,7 +10,7 @@ public class CCR3Construction {
 	 * Enter n and k values here to use the program *
 	 ************************************************/
 	public static int n = 3;
-	public static int k = 4;
+	public static int k = 12;
 	
 	public static long total;
 	

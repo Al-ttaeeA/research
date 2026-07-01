@@ -34,9 +34,9 @@ public class LexCompOptimal {
 	/*****************************************
 	 * Enter n value here to use the program *
 	 *****************************************/
-	public static int n = 6; //This value is actually n-1 since the program is based on n-length strings, so the actual n value is n+1, but for ease of use we will just use n as the input value and treat it as n-1 in the program
+	public static int n = 2; //This value is actually n-1 since the program is based on n-length strings, so the actual n value is n+1, but for ease of use we will just use n as the input value and treat it as n-1 in the program
 	
-	public static int k = 2;
+	public static int k = 12;
 	
 	public static long total;
 	
