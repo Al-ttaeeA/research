@@ -105,8 +105,66 @@ public class Construction {
         return s;
     }
 
+    /**
+     * Construct a maximal complement-free sequence for even k, even n (n >= 4).
+     *
+     * Strategy (mirrors ConstructEvenEven.constructEvenEven):
+     *   1. Run the Lempel D^-1 lift of the odd-order-(n-1) NAS k times using the
+     *      existing nasFkm / nasPrint infrastructure.  n_orig_nas is set to n (even)
+     *      so nasPrint automatically takes the Lempel lift path.  The punctured
+     *      all-(k-1) cycle is rejoined afterwards.
+     *   2. Insert k/4 complement-paired binary cycles, each translated to the symbol
+     *      pair (i, i+k/2), using a binary de Bruijn sequence of order n.
+     *   3. If k/2 is odd, insert one extra cycle derived from a Lempel-lifted binary
+     *      de Bruijn sequence of order n-1, translated to (k/4, k/4+k/2).
+     *
+     * Returns "EMPTY-STRING" for invalid input (k odd, n odd, or n < 4).
+     */
     public static String evenEven(int k, int n) {
-        return null;
+        if (k % 2 != 0 || n % 2 != 0 || n < 4) {
+            return "EMPTY-STRING";
+        }
+
+        if (k == 2) {
+            String dbseq = genericFKM(n-1, 2);
+            String lifted = lempelLift(dbseq, n - 1, 2, 1).get(0);
+            return lifted;
+        }
+
+        // Initialise NAS state: underlying odd order = n-1, full even order = n.
+        // n_orig_nas = n (even) causes nasPrint to take the Lempel D^-1 lift path.
+        nas_output = new StringBuilder();
+        k_nas      = k;
+        n_nas      = n - 1;   // odd underlying order for nasFkm / nasSmallerThanNeg
+        n_orig_nas = n;       // even: tells nasPrint to apply the Lempel lift
+        a_nas[0]   = lempel_nas = 0;
+
+        for (ITERATION_nas = 1; ITERATION_nas <= k; ITERATION_nas++) {
+            nasFkm(1, 1, 0);
+        }
+
+        // Rejoin the punctured all-(k-1) cycle to close the Eulerian circuit.
+        for (int i = k / ITERS_TIL_PUNCTURE_nas - 1; i >= 0; i--) nasPrintSym(i);
+
+        // OPTIMIZATION: genericFKM(n, 2) is invariant across the loop below — compute
+        // it once here rather than regenerating it k/4 times.
+        String dbseqN = genericFKM(n, 2);
+
+        // Insert k/4 complement-paired binary cycles translated to symbol pair (i, i+k/2).
+        for (int i = 0; i < k / 4; i++) {
+            String translated = binaryTranslate(dbseqN, i, i + k / 2);
+            nas_output = new StringBuilder(insertSequence(nas_output.toString(), translated, n));
+        }
+
+        // If k/2 is odd, insert one extra cycle via a Lempel-lifted binary de Bruijn sequence.
+        if ((k / 2) % 2 == 1) {
+            String dbseq      = genericFKM(n - 1, 2);
+            String lifted     = lempelLift(dbseq, n - 1, 2, 1).get(0);
+            String translated = binaryTranslate(lifted, k / 4, k / 4 + k / 2);
+            nas_output = new StringBuilder(insertSequence(nas_output.toString(), translated, n));
+        }
+
+        return nas_output.toString();
     }
 
     // ==========================================================================================
@@ -439,5 +497,121 @@ public class Construction {
 
         // Shift each symbol by (k-1)/2 to convert negative-free -> complement-free
         return applyComplementShift(nas_output.toString(), k);
+    }
+
+    // ==========================================================================================
+    // Even-even construction helpers
+    // ==========================================================================================
+
+    /**
+     * Generate the Granddaddy de Bruijn sequence of order n over an alphabet of size k
+     * using the standard FKM necklace enumeration (no pseudoweight filter).
+     * Enumerates all necklaces in lex order; concatenates each Lyndon word.
+     * All state is local — no NAS globals are touched.
+     */
+    private static String genericFKM(int n, int k) {
+        StringBuilder sb = new StringBuilder();
+        int[] arr = new int[n + 1];  // 1-indexed; arr[0] == 0 acts as sentinel
+        fkmGenerate(1, 1, n, k, arr, sb);
+        return sb.toString();
+    }
+
+    /** Recursive FKM enumeration helper for genericFKM. All state is passed as parameters. */
+    private static void fkmGenerate(int t, int p, int n, int k, int[] arr, StringBuilder sb) {
+        if (t > n) {
+            if (n % p == 0) {
+                for (int i = 1; i <= p; i++) {
+                    int v = arr[i];
+                    sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+                }
+            }
+            return;
+        }
+        for (int j = arr[t - p]; j < k; j++) {
+            arr[t] = j;
+            fkmGenerate(t + 1, j == arr[t - p] ? p : t, n, k, arr, sb);
+        }
+    }
+
+    /**
+     * Lempel D^-1 lift of a de Bruijn sequence of order n over Z_k with multiplier beta.
+     * Returns k vertex-disjoint cycles C_0,...,C_{k-1} each of length k^n.
+     * C_0[j] = beta^{-1} * prefix_sum(seqStr, j+1) mod k; C_i = C_0 + i (mod k).
+     *
+     * OPTIMIZATION: the C_0 prefix-sum array is computed once; each C_i is derived by
+     * adding i mod k per element, avoiding k separate prefix-sum passes.
+     */
+    private static ArrayList<String> lempelLift(String seqStr, int n, int k, int beta) {
+        int betaInv = modInverse(beta, k);
+        int len = seqStr.length();
+
+        int[] C0 = new int[len];
+        int sum = 0;
+        for (int j = 0; j < len; j++) {
+            sum = (sum + Character.getNumericValue(seqStr.charAt(j))) % k;
+            C0[j] = (betaInv * sum) % k;
+        }
+
+        ArrayList<String> cycles = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            StringBuilder sb = new StringBuilder(len);
+            for (int j = 0; j < len; j++) {
+                int v = (C0[j] + i) % k;
+                sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+            }
+            cycles.add(sb.toString());
+        }
+        return cycles;
+    }
+
+    /** Modular multiplicative inverse via the extended Euclidean algorithm. */
+    private static int modInverse(int a, int m) {
+        a = ((a % m) + m) % m;
+        int r0 = m, r1 = a, s0 = 0, s1 = 1;
+        while (r1 != 0) {
+            int q   = r0 / r1;
+            int tmp = r0 - q * r1; r0 = r1; r1 = tmp;
+            tmp = s0 - q * s1;     s0 = s1; s1 = tmp;
+        }
+        return ((s0 % m) + m) % m;
+    }
+
+    /**
+     * Map each symbol of a binary sequence to either {@code zero} (for '0') or
+     * {@code one} (for '1'), producing a k-ary sequence.
+     *
+     * OPTIMIZATION: iterates by index to avoid the char[] allocation of toCharArray().
+     */
+    private static String binaryTranslate(String sequence, int zero, int one) {
+        StringBuilder sb = new StringBuilder(sequence.length());
+        for (int ci = 0; ci < sequence.length(); ci++) {
+            int v = (sequence.charAt(ci) == '0') ? zero : one;
+            sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Insert {@code toInsert} into {@code original} at the first cyclic occurrence of
+     * {@code toInsert}'s leading (n-1)-symbol prefix.
+     *
+     * OPTIMIZATION: loop bound is simplified to original.length() (equivalent to
+     * sequence.length() - n + 1 since sequence = original + original[0..n-2]).
+     */
+    private static String insertSequence(String original, String toInsert, int n) {
+        StringBuilder sb = new StringBuilder();
+        String prefix   = toInsert.substring(0, n - 1);
+        // Extend cyclically by n-1 symbols so every cyclic window is covered.
+        String sequence = original + original.substring(0, n - 1);
+        boolean found   = false;
+        for (int i = 0; i < original.length(); i++) {
+            String current = sequence.substring(i, i + n - 1);
+            if (!found && current.equals(prefix)) {
+                sb.append(toInsert);
+                found = true;
+            }
+            sb.append(sequence.charAt(i));
+        }
+        return sb.toString();
     }
 }

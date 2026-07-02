@@ -6,21 +6,28 @@ import java.util.HashMap;
 public class CheckPairs {
 
     /** Sequences longer than this are skipped (too slow / too much memory). */
-    static final int MAX_SEQ_LEN = 500_000;
+    static final int MAX_SEQ_LEN = 5_000_000;
 
     public static void main(String[] args) {
         System.out.printf("%-4s  %-4s  %-16s  %-12s  %s%n",
                 "k", "n", "case", "length", "complement-free?");
         System.out.println("-".repeat(58));
 
-        for (int k = 2; k <= 9; k++) {
+        for (int k = 2; k <= 14; k++) {
             for (int n = 2; n <= 9; n++) {
-                if (k % 2 == 0 && n % 2 == 0) continue;   // skip even-even
-
+                if (Math.pow(k, n)/2 > MAX_SEQ_LEN) {
+                    System.out.printf("%-4d  %-4d  %-16s  %-12s  (skipped – too large)%n",
+                            k, n, "", "N/A");
+                    continue;
+                }
+                
                 String caseLabel;
                 String seq;
                 try {
-                    if (k % 2 == 0) {
+                    if (k % 2 == 0 && n % 2 == 0) {
+                        caseLabel = "even k / even n";
+                        seq = Construction.evenEven(k, n);
+                    } else if (k % 2 == 0) {
                         caseLabel = "even k / odd n";
                         seq = Construction.evenOdd(k, n);
                     } else if (n % 2 == 0) {
@@ -36,14 +43,10 @@ public class CheckPairs {
                     continue;
                 }
 
-                int len = (seq == null) ? 0 : seq.length();
+                // evenEven returns "EMPTY-STRING" for n < 4 (no construction defined there)
+                int len = (seq == null || seq.equals("EMPTY-STRING")) ? 0 : seq.length();
                 if (len == 0) {
                     System.out.printf("%-4d  %-4d  %-16s  %-12d  (empty)%n",
-                            k, n, caseLabel, len);
-                    continue;
-                }
-                if (len > MAX_SEQ_LEN) {
-                    System.out.printf("%-4d  %-4d  %-16s  %-12d  (skipped – too large)%n",
                             k, n, caseLabel, len);
                     continue;
                 }
