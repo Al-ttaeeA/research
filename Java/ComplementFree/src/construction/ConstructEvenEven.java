@@ -1,8 +1,13 @@
 package construction;
 
+import checker.Checker;
+import java.util.ArrayList;
+
 public class ConstructEvenEven {
     public static int n = 4;
-    public static int k = 12;
+    public static int k = 14;
+
+    public static int MAX_SEQ_LEN = 5_000_000;
 
     // -------------------------------------------------------------------------
     // Static state mirroring NAS.c globals
@@ -16,8 +21,27 @@ public class ConstructEvenEven {
     private static StringBuilder output;   // accumulated output
 
     public static void main(String[] args) {
-        String construction = constructEvenEven(n, k);
-        System.out.println(construction);
+        //System.out.println(constructEvenEven(n, k));
+        loop();
+    }
+
+    public static void loop() {
+        // Loop through values k = 4, 6, 8, ..., 14 and n = 4, 6, 8
+        for (int k = 4; k <= 14; k += 2) {
+            for (int n = 4; n <= 8; n += 2) {
+                if (Math.pow(k, n)/2 > MAX_SEQ_LEN) {
+                    System.out.printf("Skipping n=%d, k=%d: sequence too long%n", n, k);
+                    continue;
+                }
+
+                System.out.println("Constructing sequence for n=" + n + ", k=" + k);
+
+                String cas = constructEvenEven(n, k);
+                
+                // Check if the constructed sequence is complement-free
+                Checker.extensiveCheck(cas, k, n);
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -52,6 +76,36 @@ public class ConstructEvenEven {
 
         // Rejoin the punctured all-(k-1) cycle (mirrors: for i=k/ITERS-1; i>=0; i--)
         for (int i = k_inner / ITERS_TIL_PUNCTURE - 1; i >= 0; i--) printSym(i);
+
+        //System.out.println(output.toString());
+
+        // Now we need to add the extra cycles
+        for (int i = 0; i < k_param/4; i++) {
+            String dbseq = genericFKM(n_param, 2);
+
+            String translated = binaryTranslate(dbseq, i, i + k_param/2);
+
+            //System.out.println("Adding cycle \n" + translated + " to output, original dbseq = \n" + dbseq);
+
+            String newSequence = insertSequence(output.toString(), translated, n_param);
+
+            output = new StringBuilder(newSequence);
+        }
+
+        // If k/2 is odd, add a complement free DB sequence of order n 
+        if((k_param / 2) % 2 == 1) {
+            String dbseq = genericFKM(n_param - 1, 2);
+
+            String lifted = lempelLift(dbseq, n_param - 1, 2, 1).get(0);
+
+            String translated = binaryTranslate(lifted, k_param/4, k_param/4 + k_param/2);
+            
+            //System.out.println("Adding cycle \n" + translated + " to output, original dbseq = \n" + lifted);
+
+            String newSequence = insertSequence(output.toString(), translated, n_param);
+
+            output = new StringBuilder(newSequence);
+        }
 
         return output.toString();
     }
@@ -160,5 +214,112 @@ public class ConstructEvenEven {
             if (j == a[t - p]) fkm(t + 1, p, w + x);
             else               fkm(t + 1, t, w + x);
         }
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Method to generate full DB sequence of order n over Z_k using generic FKM
+    // Enumerates necklaces in lex order; concatenates each Lyndon word (least period)
+    // to produce the Granddaddy de Bruijn sequence.
+    // -------------------------------------------------------------------------
+    private static String genericFKM(int n, int k) {
+        StringBuilder sb = new StringBuilder();
+        int[] arr = new int[n + 1]; // 1-indexed; arr[0] unused (stays 0, acts as sentinel)
+        fkmGenerate(1, 1, n, k, arr, sb);
+        return sb.toString();
+    }
+
+    // Recursive helper for genericFKM — standard FKM necklace enumeration.
+    // Appends the Lyndon word a[1..p] whenever n % p == 0 (valid necklace root).
+    private static void fkmGenerate(int t, int p, int n, int k, int[] arr, StringBuilder sb) {
+        if (t > n) {
+            if (n % p == 0) {
+                for (int i = 1; i <= p; i++) {
+                    int v = arr[i];
+                    sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+                }
+            }
+            return;
+        }
+        for (int j = arr[t - p]; j < k; j++) {
+            arr[t] = j;
+            fkmGenerate(t + 1, j == arr[t - p] ? p : t, n, k, arr, sb);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Method to lift a DB sequence of order n-1 over Z_k to order n using Lempel's lift
+    // (Alhakim et al. general k-ary Lempel lift, unpunctured case).
+    // Returns a list of k disjoint cycles C_0, ..., C_{k-1} each of length k^(n-1).
+    // -------------------------------------------------------------------------
+    private static ArrayList<String> lempelLift(String seqStr, int n, int k, int beta) {
+        int betaInv = modInverse(beta, k);
+        int len = seqStr.length(); // k^(n-1)
+
+        // Build C_0: C_0[j] = beta^{-1} * (gamma_1 + ... + gamma_{j+1}) mod k
+        int[] C0 = new int[len];
+        int sum = 0;
+        for (int j = 0; j < len; j++) {
+            sum = (sum + Character.getNumericValue(seqStr.charAt(j))) % k;
+            C0[j] = (betaInv * sum) % k;
+        }
+
+        // C_i = C_0 + i (mod k), giving k vertex-disjoint cycles (Theorem 3.2(c))
+        ArrayList<String> cycles = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < len; j++) {
+                int v = (C0[j] + i) % k;
+                sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+            }
+            cycles.add(sb.toString());
+        }
+        return cycles;
+    }
+
+    // Modular multiplicative inverse via extended Euclidean algorithm
+    private static int modInverse(int a, int m) {
+        a = ((a % m) + m) % m;
+        int r0 = m, r1 = a, s0 = 0, s1 = 1;
+        while (r1 != 0) {
+            int q  = r0 / r1;
+            int tmp = r0 - q * r1; r0 = r1; r1 = tmp;
+            tmp = s0 - q * s1;     s0 = s1; s1 = tmp;
+        }
+        return ((s0 % m) + m) % m;
+    }
+
+    // Translate a binary sequence (0,1) to a k-ary sequence (zero,one)
+    private static String binaryTranslate(String sequence, int zero, int one) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : sequence.toCharArray()) {
+            int v = (c == '0') ? zero : one;
+            sb.append(v < 10 ? (char) ('0' + v) : (char) ('A' + v - 10));
+        }
+        return sb.toString();
+    }
+
+    // Insert a cycle into an original sequence at first occurance of the n-1 length prefix 
+    private static String insertSequence(String original, String toInsert, int n) {
+        StringBuilder sb = new StringBuilder();
+
+        String prefix = toInsert.substring(0, n - 1);
+
+        String sequence = original + original.substring(0, n - 1);
+
+        //System.out.println("Prefix: " + prefix + ", toInsert: " + toInsert);
+
+        boolean found = false;
+
+        for(int i = 0; i < sequence.length() - n + 1; i++) {
+            String current = sequence.substring(i, i + n - 1);
+            if (current.equals(prefix) && !found) {
+                sb.append(toInsert);
+                found = true;
+            }
+            sb.append(sequence.charAt(i));
+        }
+
+        return sb.toString();
     }
 }
