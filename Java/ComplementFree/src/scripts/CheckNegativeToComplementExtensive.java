@@ -1,23 +1,19 @@
 package scripts;
 
 import checker.Checker;
-import java.io.BufferedReader;
+import construction.ConstructEvenEven;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lempels.Lempels;
 
 public class CheckNegativeToComplementExtensive {
 
-    static final String NAS_EXE =
-            "C:\\Users\\Admin\\research\\C\\negative free\\NAS.exe";
     static final int MAX_SEQ_LEN = 5_000_000;
     static final String OUTPUT_FILE =
-            "C:\\Users\\Admin\\research\\negative_to_complement_extensive.json";
+            "C:\\Users\\Admin\\research\\JSON Data\\negative_to_complement_extensive.json";
 
     public static void main(String[] args) throws Exception {
         LinkedHashMap<String, Object> jsonRoot = new LinkedHashMap<>();
@@ -37,48 +33,19 @@ public class CheckNegativeToComplementExtensive {
 
     private static void processAndCollect(int k, int n,
                                           LinkedHashMap<String, Object> jsonRoot) {
-        int nasOrder = n - 1;
         String key = "n=" + n + ",k=" + k;
         LinkedHashMap<String, Object> entry = new LinkedHashMap<>();
 
-        if (Math.pow(k, nasOrder) / 2 > MAX_SEQ_LEN) {
-            entry.put("skipped", "NAS too large (k^" + nasOrder + " / 2 > " + MAX_SEQ_LEN + ")");
+        // ---- Step 1: generate CAS via ConstructEvenEven ------------------------------
+        String cas = ConstructEvenEven.constructEvenEven(n, k);
+
+        if (cas == null || cas.equals("EMPTY-STRING") || cas.isEmpty()) {
+            entry.put("error", "constructEvenEven returned no sequence");
             jsonRoot.put(key, entry);
             return;
         }
-
-        // ---- Step 1: generate NAS at order n-1 ----------------------------------------
-        String nas;
-        try {
-            nas = runNAS(nasOrder, k);
-        } catch (Exception e) {
-            entry.put("error", "NAS.exe failed: " + e.getMessage());
-            jsonRoot.put(key, entry);
-            return;
-        }
-
-        if (nas.isEmpty()) {
-            entry.put("error", "NAS.exe returned empty sequence");
-            jsonRoot.put(key, entry);
-            return;
-        }
-
-        entry.put("NAS", nas);
-
-        // ---- Step 2: puncture last digit, then apply Lempel's lift --------------------
-        String seqPunctured = nas.substring(0, nas.length() - 1);
-        ArrayList<String> cycles = Lempels.lempelLift(seqPunctured, nasOrder, k, 1, false, true);
-
-        if (cycles.isEmpty()) {
-            entry.put("error", "Lempel's lift returned no cycles");
-            jsonRoot.put(key, entry);
-            return;
-        }
-
-        String cas = cycles.get(0);   // punctured lift always returns a single cycle
 
         if (cas.length() > MAX_SEQ_LEN) {
-            entry.put("NAS", nas);
             entry.put("skipped", "CAS too large (len=" + cas.length() + ")");
             jsonRoot.put(key, entry);
             return;
@@ -86,7 +53,7 @@ public class CheckNegativeToComplementExtensive {
 
         entry.put("CAS", cas);
 
-        // ---- Step 3: collect missing complement pairs ---------------------------------
+        // ---- Step 2: collect missing complement pairs --------------------------------
         ArrayList<String[]> missing = Checker.getMissingPairs(cas, k, n);
 
         if (missing == null) {
@@ -103,36 +70,6 @@ public class CheckNegativeToComplementExtensive {
         }
 
         jsonRoot.put(key, entry);
-    }
-
-    // -------------------------------------------------------------------------
-    // NAS runner — identical to CheckNegativeToComplement
-    // -------------------------------------------------------------------------
-
-    private static String runNAS(int n, int k) throws IOException, InterruptedException {
-        Process proc = new ProcessBuilder(NAS_EXE)
-                .redirectErrorStream(true)
-                .start();
-        proc.getOutputStream().write((n + " " + k + "\n").getBytes());
-        proc.getOutputStream().close();
-
-        StringBuilder seq = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(proc.getInputStream()))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.contains("Length") || line.contains("Expected")) continue;
-                if (line.startsWith("Enter")) {
-                    int colon = line.indexOf(": ");
-                    line = (colon >= 0) ? line.substring(colon + 2) : "";
-                }
-                for (char c : line.toCharArray()) {
-                    if (Character.isDigit(c) || (c >= 'A' && c <= 'Z')) seq.append(c);
-                }
-            }
-        }
-        proc.waitFor();
-        return seq.toString();
     }
 
     // -------------------------------------------------------------------------

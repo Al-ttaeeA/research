@@ -11,15 +11,15 @@ public class Lempels {
 	 * Enter values here
 	 ************************************************/
 	static int n = 3;
-	static int k = 10;
+	static int k = 2;
 	static int beta = 1;
 	static boolean punctured = false;
 	// de Bruijn sequence of order n over Z_k — weight must be 0 mod k
 	// (guaranteed for n > 1, or n = 1 with odd k, by Lemma 3.7)
-	static String sequence = "006007008009019028029037038039046047048049056057058059065066067068069074075076077078079083084085086087088089092093094095096097098099159168169177178179186187188189196197198199258259267268269276277278279286287288289295296297298299349357358359366367368369376377378379385386387388389394395396397398399448449456457458459466467468469475476477478479485486487488489495496497498499556557558559566567568569576577578579586587588589596597598599666766866967767867968768868969769869977787797887897987998889899";
+	static String sequence = "00010111";
 
 	public static void main(String[] args) {
-		ArrayList<String> cycles = lempelLift(sequence, n, k, beta, false, true);
+		ArrayList<String> cycles = lempelLift(sequence, n, k, beta, false, false);
 
 		System.out.println(cycles.size() + " inverse cycle(s) in B_" + (n+1) + "(" + k + "):");
 		for (int i = 0; i < cycles.size(); i++)
