@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Checker {
-    public static String sequence = "004443343353354415521152204421102214431105032315043431210253521315154052431321415254153043053054204310544422211211311322533055300422055400522155434101534212150540313051535324302151052530325314214314320421543222000030033030333300055055155100311433144200433244300533212545312050534324151435313102140535430314103152052152104205321114414111155544544044055200322033155322133255422101434201545423213040324202051035424325203052041541041053154210555333223224224330441004115331005110332005452120453232010514241020404354132021030414304253254254315320543331110010020021142254425531154435541104432305042310104543520254042421325104054142521420310320321531043210";
+    public static String sequence = "00102030405061121322463342362517";
 
-    public static int n = 4;
-    public static int k = 6;
+    public static int n = 2;
+    public static int k = 8;
 
     public static void main(String[] args) {
         extensiveCheck(sequence, k, n);
@@ -42,7 +42,14 @@ public class Checker {
         System.out.println("Sequence is complement-free.");
 
         // Check all possible single-digit insertions and add them, then check again and loop 
-        
+        for (int digit = 0; digit < k; digit++) {
+            for (int pos = 0; pos <= len; pos++) {
+                String newSeq = sequence.substring(0, pos) + digit + sequence.substring(pos);
+                if (checkComplementFree(newSeq, len + 1, n, k)) {
+                    System.out.println("Can insert " + digit + " at position " + pos + " to get complement-free sequence: " + newSeq);
+                }
+            }
+        }
         
     }
 
