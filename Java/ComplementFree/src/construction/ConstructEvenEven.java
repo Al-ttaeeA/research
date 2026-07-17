@@ -299,6 +299,76 @@ public class ConstructEvenEven {
         return sb.toString();
     }
 
+    // -------------------------------------------------------------------------
+    // Public API for scripts
+    // -------------------------------------------------------------------------
+
+    /**
+     * Constructs the base sequence: NAS lift + rejoined punctured cycle,
+     * before any extra binary/complement-free sequences are inserted.
+     */
+    public static String constructBaseSequence(int n_param, int k_param) {
+        if (k_param % 2 != 0 || n_param % 2 != 0 || n_param < 4) {
+            return "EMPTY-STRING";
+        }
+        output  = new StringBuilder();
+        k_inner = k_param;
+        n_inner = n_param - 1;
+        a[0]    = lempel = 0;
+
+        for (ITERATION = 1; ITERATION <= k_inner; ITERATION++) {
+            fkm(1, 1, 0);
+        }
+        for (int i = k_inner / ITERS_TIL_PUNCTURE - 1; i >= 0; i--) printSym(i);
+
+        return output.toString();
+    }
+
+    /**
+     * Returns the ordered list of translated binary sequences that the construction
+     * would insert for a given (n, k):
+     *   - k/4 binary de Bruijn sequences (translated from {0,1} to {i, i+k/2})
+     *   - when k/2 is odd, one additional complement-free sequence (Lempel-lifted,
+     *     translated to {k/4, k/4+k/2})
+     */
+    public static ArrayList<String> getExtraSequences(int n_param, int k_param) {
+        ArrayList<String> seqs = new ArrayList<>();
+
+        for (int i = 0; i < k_param / 4; i++) {
+            String dbseq      = genericFKM(n_param, 2);
+            String translated = binaryTranslate(dbseq, i, i + k_param / 2);
+            seqs.add(translated);
+        }
+
+        if ((k_param / 2) % 2 == 1) {
+            String dbseq      = genericFKM(n_param - 1, 2);
+            String lifted     = lempelLift(dbseq, n_param - 1, 2, 1).get(0);
+            String translated = binaryTranslate(lifted, k_param / 4, k_param / 4 + k_param / 2);
+            seqs.add(translated);
+        }
+
+        return seqs;
+    }
+
+    /**
+     * Finds every position in {@code original} (treated cyclically) where
+     * {@code toInsert} could be spliced in — i.e. where the (n-1)-length prefix
+     * of {@code toInsert} matches a window of the cyclic sequence.
+     * The returned indices correspond to positions in the original (non-extended) string.
+     */
+    public static ArrayList<Integer> findAllInsertionIndices(String original, String toInsert, int n) {
+        ArrayList<Integer> indices = new ArrayList<>();
+        String prefix   = toInsert.substring(0, n - 1);
+        String sequence = original + original.substring(0, n - 1);
+
+        for (int i = 0; i < original.length(); i++) {
+            if (sequence.substring(i, i + n - 1).equals(prefix)) {
+                indices.add(i);
+            }
+        }
+        return indices;
+    }
+
     // Insert a cycle into an original sequence at first occurance of the n-1 length prefix 
     private static String insertSequence(String original, String toInsert, int n) {
         StringBuilder sb = new StringBuilder();

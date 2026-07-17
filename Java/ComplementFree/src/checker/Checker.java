@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Checker {
-    public static String sequence = "00102030405061121322463342362517";
+    public static String sequence = "1928293723839464748495565758596673686977879188990";
 
     public static int n = 2;
-    public static int k = 8;
+    public static int k = 10;
 
     public static void main(String[] args) {
         extensiveCheck(sequence, k, n);
@@ -86,8 +86,14 @@ public class Checker {
             System.out.println("Sequence has maximum length (" + maxLength + ").");
             return;
         }
-
-        System.out.println("Sequence length " + len + " is less than maximum " + maxLength + ". Missing complement pairs:");
+        else{
+            if(n == 2 && k % 2 == 0) {
+                System.out.println("Sequence is maximal length since n=2 and k is even. Here's the missing pair:");
+            }
+            else{
+                System.out.println("Sequence length " + len + " is less than maximum " + maxLength + ". Missing complement pairs:");
+            }
+        }
 
         boolean[] printed = new boolean[total];
         for (int idx = 0; idx < total; idx++) {
