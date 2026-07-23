@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.0 Chrome/140.0.7339.249 Electron/38.7.2 Safari/537.36" version="29.3.0">
   <diagram name="Page-1" id="YFbPioag54mKgZGH9Orn">
-    <mxGraphModel dx="2066" dy="1201" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1181" dy="686" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -361,6 +361,42 @@
         </mxCell>
         <mxCell id="qGyQn1BHhKlmSEBrY9DH-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="O(1) using hashmap for storing index of each appearing string WHILE constructing FKM&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;We could also use a linked list since inserting the k/2 digits to a string costs time per digit inserted&lt;/div&gt;" vertex="1">
           <mxGeometry height="330" width="120" x="940" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Example for n=2, k=10" vertex="1">
+          <mxGeometry height="30" width="140" x="1360" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="192829373839464748495565758596676869778798899" vertex="1">
+          <mxGeometry height="30" width="330" x="1265" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Start with" vertex="1">
+          <mxGeometry height="30" width="70" x="1395" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Loop iteration #1, i=0, we need to find&amp;nbsp;&lt;div&gt;&quot;91&quot; and add 0 in the middle&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="230" x="1315" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="192829373839464748495565758596676869778798899&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;0&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="330" x="1265" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Loop iteration #1, then we need to&amp;nbsp;&lt;div&gt;find &quot;98&quot; and add 1 in the middle&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="210" x="1325" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="19282937383946474849556575859667686977879&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;1&lt;/font&gt;8899&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;0&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="330" x="1265" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Loop iteration #2, i=1, we need to find&amp;nbsp;&lt;div&gt;&quot;73&quot; and add 2 in the middle&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="230" x="1315" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="19282937&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;2&lt;/font&gt;383946474849556575859667686977879&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;1&lt;/font&gt;8899&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;0&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="330" x="1265" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="Loop iteration #2, then we need to&amp;nbsp;&lt;div&gt;find &quot;76&quot; and add 3 in the middle&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="210" x="1325" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="19282937&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;2&lt;/font&gt;383946474849556575859667&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;3&lt;/font&gt;686977879&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;1&lt;/font&gt;8899&lt;font style=&quot;color: rgb(255, 17, 17);&quot;&gt;0&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="330" x="1265" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="MsSkpVvFn-mNZoWK_bTs-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="The last complementary pair that cannot be added is 45/54&lt;div&gt;Thus this sequence is maximal&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="340" x="1260" y="530" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

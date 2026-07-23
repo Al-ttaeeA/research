@@ -4,12 +4,21 @@ import checker.Checker;
 
 public class ConstructEven2 {
     public static int n = 2;
-    public static int k = 10;
+    public static int k = 8;
 
     public static int MAX_SEQ_LEN = 1000000; // maximum length of the sequence to construct
 
     public static void main(String[] args) {
-        loop(30);
+        // loop(30);
+
+        // Just FKM construction
+        // int[] arr = new int[n + 1];
+        // StringBuilder sb = new StringBuilder();
+        // fkm(1, 1, 0, n, k, arr, sb);
+        // System.out.println("Constructed sequence: " + sb.toString());
+
+        String seq = constructSequence(n, k);
+        System.out.println("Constructed sequence: " + seq);
     }
 
     public static void loop(int maxK) {

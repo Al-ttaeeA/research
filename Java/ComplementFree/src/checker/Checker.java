@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Checker {
-    public static String sequence = "1928293723839464748495565758596673686977879188990";
+    public static String sequence = "71727374757016626364655352344";
 
-    public static int n = 2;
-    public static int k = 10;
+    public static int mainN = 2;
+    public static int mainK = 8;
 
     public static void main(String[] args) {
-        extensiveCheck(sequence, k, n);
+        extensiveCheck(sequence, mainK, mainN);
     }
 
     public static void check(String sequence, int k, int n) {
